@@ -48,13 +48,10 @@
 | Wraith Cape       | Swamp        | Weak flying, reduced regeneration          |
 | Leech Cape        | Swamp        | Lifesteal                                  |
 
->## Changelog
-
-1.2.3 - Bugfix for linen cape
-
 >## Bug Reporting
-
 You can report issues with the mod at the github page:
 https://github.com/Happydragun4now/DragoonCapes/issues
 
-I will eventually push the entire project for the mod once it is less shamefully designed lol.
+>## Changelog
+1.2.3 - Bugfix for linen cape
+

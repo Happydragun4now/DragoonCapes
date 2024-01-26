@@ -35,7 +35,7 @@ namespace DragoonCapes
         static UnityEngine.Vector3 currentVel = UnityEngine.Vector3.zero;//currentvel is very sus to be using, used like this just bc thats how the character file works as well
         public static void Process_Input(Player player, ref Rigidbody playerBody, ref float m_maxAirAltitude)
         {
-            if (flightTime <= DragoonCapes.Instance.WraithFlightTime.Value && !player.IsDead() && !player.InAttack() && !player.IsEncumbered() && !player.InDodge() && !player.IsKnockedBack())
+            if (flightTime <= DragoonCapes.Instance.WraithFlightTime.Value && !player.IsOnGround() && !player.IsDead() && !player.InAttack() && !player.IsEncumbered() && !player.InDodge() && !player.IsKnockedBack())
             {
                 //Do Flying Stuff
                 flightTime++;

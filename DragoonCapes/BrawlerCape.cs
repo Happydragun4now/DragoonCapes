@@ -16,7 +16,6 @@ namespace DragoonCapes
         [HarmonyPatch(typeof(Character), "Damage")]
         private static void JotunnPunch_Prefix(HitData hit)
         {
-            bool potionActive = false;
             Player player = Player.m_localPlayer;
             SEMan playerStatus = player.GetSEMan();
 

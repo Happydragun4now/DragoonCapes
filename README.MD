@@ -8,7 +8,7 @@
 >## Features
 - RPG-like buffs added to all capes that allow new ways to fight and solidify old ones.
 - (Feather cape was cool enough on it's own so it got no added bonus)
-- Adds 17 new capes each with unique textures, effects, and recipes, to add even more variety to your choices.
+- Adds 18 new capes each with unique textures, effects, and recipes, to add even more variety to your choices.
 - Designed to make all capes viable depending on your playstyle, giving you a reason to use old capes!
 - Also adds a feather fall utility slot item to free up the cape slot from feather cape.
 - Now has config values!
@@ -28,7 +28,7 @@
 | Deer Cape         | Black Forest | Bow and crossbow skill, Movement Speed     |
 | Greydwarf Cape    | Black Forest | Minor casting skills, flat eitr bonus      |
 | Surtling Cape     | Black Forest | Immolation!                                |
-| Einherjar         | Black Forest | Spear throw speed, Lightning               |
+| Einherjar Cape    | Black Forest | Spear throwing, lightning                  |
 | Boar Cape         | Meadows      | Stamina and dodging                        |
 | Bush Cape         | Meadows      | Stealth archery                            |
 | Feather Cape      | Mistlands    | Feather Fall                               |
@@ -53,5 +53,8 @@ You can report issues with the mod at the github page:
 https://github.com/Happydragun4now/DragoonCapes/issues
 
 >## Changelog
-1.2.3 - Bugfix for linen cape
+1.2.7 - Shaman, knight, nightstalker bug fixes
+1.2.6 - New Icon, also retextured einherjar, wraith capes and fixed a small issue with wraith cape
+1.2.5 - Sleep effect on adventurer cape, spear return effect on einherjar cape, draw speed on nightstalker cape, as well as more consistent descriptions and default balance configs
+1.2.4 - Bugfix for linen cape
 

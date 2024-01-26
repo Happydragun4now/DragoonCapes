@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using Logger = Jotunn.Logger;
 
 namespace DragoonCapes
 {
@@ -25,28 +26,17 @@ namespace DragoonCapes
             public static void Attack_ChangeCosts_Prefix(ref Attack __instance, ref ItemDrop.ItemData weapon)
             {
                 Player player = Player.m_localPlayer;
+                if (player == null || player.IsDead())
+                {
+                    return;
+                }
+
                 if (player.GetSEMan().HaveStatusEffectCategory("ShamanCape") && weapon.m_shared.m_attack.m_attackEitr > player.GetEitr())
                 {
                     float curEitr = player.GetEitr();
-                    float healthCost = weapon.m_shared.m_attack.m_attackEitr - curEitr;
-                    //weapon.m_shared.m_attack.m_attackHealth = healthCost;
-                    //weapon.m_shared.m_attack.m_attackEitr = 0f;
+                    float healthCost = weapon.m_shared.m_attack.m_attackEitr - curEitr;//health cost is the eitr cost - the eitr it will tak
                     __instance.m_attackHealth = healthCost;
-                    __instance.m_attackEitr = curEitr;
-                    
-                    /*
-                    if (healthCost >= 1)
-                    {
-                        
-                        __instance.m_AttackChainLevels += 1;
-                        if (m_nextAttackChainLevel >= m_attackChainLevels)
-                        {
-                            m_nextAttackChainLevel = 0;
-                        }
-                        
-                    }
-                    */
-                    //player.UseEitr(curEitr);//instead of attackEitr = curEitr, attackEitr = 0
+                    __instance.m_attackEitr = curEitr-0.1f;//hopefully not emptying Eitr will allow it to cast.
                 }
             }
         }

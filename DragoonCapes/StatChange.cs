@@ -17,16 +17,23 @@ namespace DragoonCapes
             [HarmonyPatch(typeof(Player), "GetTotalFoodValue")]
             private static void Player_GetTotalFoodValue_Postfix(ref float eitr, ref float hp, ref float stamina)
             {
-                if (Player.m_localPlayer.GetSEMan().HaveStatusEffectCategory("LoxCape"))
+                //set player, make sure they are real and alive
+                Player player = Player.m_localPlayer;
+                if (player == null || player.IsDead())
+                {
+                    return;
+                }
+
+                if (player.GetSEMan().HaveStatusEffectCategory("LoxCape"))
                 {
                     hp *= DragoonCapes.Instance.LoxHealth.Value;
                 }
                 //sandwiched in here due to laziness
-                else if (Player.m_localPlayer.GetSEMan().HaveStatusEffectCategory("dwarfCape"))
+                else if (player.GetSEMan().HaveStatusEffectCategory("dwarfCape"))
                 {
                     eitr += DragoonCapes.Instance.GreyEitr.Value;
                 }
-                else if (Player.m_localPlayer.GetSEMan().HaveStatusEffectCategory("wraithCape"))
+                else if (player.GetSEMan().HaveStatusEffectCategory("wraithCape"))
                 {
                     hp *= 1f - DragoonCapes.Instance.WraithPenalty.Value;
                     stamina *= 1f - DragoonCapes.Instance.WraithPenalty.Value;

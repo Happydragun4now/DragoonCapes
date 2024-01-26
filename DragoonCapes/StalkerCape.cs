@@ -5,6 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using static ItemSets;
+using static Skills;
 using Logger = Jotunn.Logger;
 
 namespace DragoonCapes
@@ -12,14 +15,29 @@ namespace DragoonCapes
     [HarmonyPatch]
     internal class StalkerCape
     {
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Character), "Damage")]
-        private static void Damage_Prefix(HitData hit)
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Skills), "GetSkillFactor")]
+        private static void BowSkill_postfix(ref Skills __instance, ref SkillType skillType, ref float __result)
         {
             Player player = Player.m_localPlayer;
-            if (hit.GetAttacker() == player && player.GetSEMan().HaveStatusEffectCategory("stalkerCape") && player.GetSEMan().HaveStatusEffect("Cold"))
+            if (player == null || player.IsDead())
             {
-                hit.m_damage.Modify(Math.Max(1f,1f + DragoonCapes.Instance.nightstalkerDamageMult.Value));
+                return;
+            }
+            //This works but shows the bow skill during the daytime
+            if (skillType == Skills.SkillType.Bows && player.GetSEMan().HaveStatusEffectCategory("stalkerCape"))
+            {
+                if (EnvMan.instance.IsNight())
+                {
+                    __result = Mathf.Clamp(__instance.GetSkillLevel(skillType)/100f, 0f, (100f+DragoonCapes.Instance.nightstalkerSkill.Value)/100f);
+                }
+                else
+                {
+                    float newSkill = __instance.GetSkillLevel(skillType) - DragoonCapes.Instance.nightstalkerSkill.Value;
+                    __result = Mathf.Clamp(newSkill / 100f, 0f, (100f + DragoonCapes.Instance.nightstalkerSkill.Value) / 100f);
+                }
+                //__result += DragoonCapes.Instance.nightstalkerSkillFactor.Value;//increases the returned bow skill factor by the config value in a way it can go over 100 bow skill
+                //Logger.LogInfo("Returned Bow Skill: " + __result);
             }
         }
 

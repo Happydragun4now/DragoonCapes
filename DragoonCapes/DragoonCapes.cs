@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using static Skills;
 using Logger = Jotunn.Logger;
 using Paths = BepInEx.Paths;
@@ -27,8 +28,8 @@ namespace DragoonCapes
     {
         public const string PluginGUID = "com.HappyDragoon.DragoonCapes";
         public const string PluginName = "DragoonCapes";
-        public const string PluginVersion = "1.2.2";
-        
+        public const string PluginVersion = "1.2.8";
+
         public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
 
         //Reference this instance of the class as the local instance? Used to reference config values from other classes.
@@ -48,15 +49,14 @@ namespace DragoonCapes
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
         }
 
-
         //Declare Configuration Variables (Doesn't seem to be needed for server Configs)
         public ConfigEntry<bool> vanillaCapeEffectsEnabled;
         public ConfigEntry<bool> dragoonCapeEffectsEnabled;
         public ConfigEntry<bool> featherBeltEnabled;
 
-        public ConfigEntry<int>  WolfArmor;
-        public ConfigEntry<int>  WolfArmorPerLevel;
-        public ConfigEntry<int>  WolfSkill;
+        public ConfigEntry<int> WolfArmor;
+        public ConfigEntry<int> WolfArmorPerLevel;
+        public ConfigEntry<int> WolfSkill;
 
         public ConfigEntry<float> DeerMoveSpeed;
         public ConfigEntry<int> DeerSkill;
@@ -72,6 +72,7 @@ namespace DragoonCapes
         public ConfigEntry<float> TrollDamageMult;
 
         public ConfigEntry<int> NeckSkill;
+        public ConfigEntry<bool> NeckWaterproof;
 
         public ConfigEntry<int> CultistSkill;
         public ConfigEntry<float> CultistRegen;
@@ -110,6 +111,7 @@ namespace DragoonCapes
 
         public ConfigEntry<float> EinherjarVelocity;
         public ConfigEntry<float> EinherjarDamageMult;
+        public ConfigEntry<bool> EinherjarEffect;
 
         public ConfigEntry<float> SurtlingDamageMult;
 
@@ -119,7 +121,10 @@ namespace DragoonCapes
         public ConfigEntry<float> LeechLifesteal;
 
         public ConfigEntry<float> nightstalkerRegen;
-        public ConfigEntry<float> nightstalkerDamageMult;
+        public ConfigEntry<int> nightstalkerSkill;
+
+        public ConfigEntry<bool> AdventurerEffect1;
+        public ConfigEntry<bool> AdventurerEffect2;
 
         private void CreateConfigValues()
         {
@@ -127,13 +132,13 @@ namespace DragoonCapes
             Config.SaveOnConfigSet = true;
 
             vanillaCapeEffectsEnabled = Config.Bind("Server config", "vanillaCapeEffectsEnabled", true,
-            new ConfigDescription("Enable the status effects/abilities added to the vanilla game capes", null,
+            new ConfigDescription("Enable Effects on vanilla capes", null,
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
             dragoonCapeEffectsEnabled = Config.Bind("Server config", "dragoonCapeEffectsEnabled", true,
-            new ConfigDescription("Enable the status effects/abilities of the mods capes, false means they are for looks only.", null,
+            new ConfigDescription("Enable Effects on modded capes", null,
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
             featherBeltEnabled = Config.Bind("Server config", "featherBeltEnabled", true,
-            new ConfigDescription("Enable the Feather Fall belt item.", null,
+            new ConfigDescription("$featherBeltEnabled", null,
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             WolfArmor = Config.Bind("Server config", "WolfArmor", 4,
@@ -143,7 +148,7 @@ namespace DragoonCapes
             WolfArmorPerLevel = Config.Bind("Server config", "WolfArmorPerLevel", 2,
             new ConfigDescription("Wolf cape armor increase per Level", null,
             new AcceptableValueRange<int>(0, 100),
-            new ConfigurationManagerAttributes { IsAdminOnly = true }));          
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
             WolfSkill = Config.Bind("Server config", "WolfSkill", 10,
             new ConfigDescription("Wolf cape skill bonuses", null,
             new AcceptableValueRange<int>(0, 100),
@@ -193,6 +198,9 @@ namespace DragoonCapes
             new ConfigDescription("Neck cape skill bonus.", null,
             new AcceptableValueRange<int>(0, 100),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            NeckWaterproof = Config.Bind("Server config", "NeckWaterproof", true,
+            new ConfigDescription("Neck cape waterproofness. true=waterproof", null,
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             CultistSkill = Config.Bind("Server config", "CultistSkill", 10,
             new ConfigDescription("Cultist cape skill bonuses.", null,
@@ -240,7 +248,7 @@ namespace DragoonCapes
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
             CrusaderDamageBlunt = Config.Bind("Server config", "CrusaderDamageBlunt", 0.1f,
             new ConfigDescription("Crusader cape added blunt damage.", null,
-            new AcceptableValueRange<float>(0.01f, 100f), 
+            new AcceptableValueRange<float>(0.01f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             BerserkDamageMult = Config.Bind("Server config", "BerserkDamageMult", 0.4f,
@@ -305,13 +313,16 @@ namespace DragoonCapes
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
 
-            EinherjarDamageMult = Config.Bind("Server config", "EinherjarDamageMult", 0.25f,
+            EinherjarDamageMult = Config.Bind("Server config", "EinherjarDamageMult", 0.08f,
             new ConfigDescription("Einherjar cape added lighting damage.", null,
             new AcceptableValueRange<float>(0.01f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            EinherjarVelocity = Config.Bind("Server config", "EinherjarVelocity", 1.5f,
+            EinherjarVelocity = Config.Bind("Server config", "EinherjarVelocity", 1.3f,
             new ConfigDescription("Einherjar cape added spear velocity.", null,
             new AcceptableValueRange<float>(1f, 100f),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            EinherjarEffect = Config.Bind("Server config", "EinherjarEffect", true,
+            new ConfigDescription("If infinite throwing spears is enabled.", null,
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             SurtlingDamageMult = Config.Bind("Server config", "SurtlingDamageMult", 0.4f,
@@ -319,11 +330,11 @@ namespace DragoonCapes
             new AcceptableValueRange<float>(0.01f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
-            HrugnirCarryWeight = Config.Bind("Server config", "HrugnirCarryWeight", 25,
+            HrugnirCarryWeight = Config.Bind("Server config", "HrugnirCarryWeight", 35,
             new ConfigDescription("Hrugnir cape added carry weight.", null,
             new AcceptableValueRange<int>(0, 1000),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            HrugnirDamageMult = Config.Bind("Server config", "HrugnirDamageMult", 0.35f,
+            HrugnirDamageMult = Config.Bind("Server config", "HrugnirDamageMult", 0.25f,
             new ConfigDescription("Hrugnir cape added unarmed damage while mead is on cooldown.", null,
             new AcceptableValueRange<float>(0.01f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
@@ -334,12 +345,19 @@ namespace DragoonCapes
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             nightstalkerRegen = Config.Bind("Server config", "nightstalkerRegen", 1.3f,
-            new ConfigDescription("Nightstalker cape stamina regen multiplier.", null,
+            new ConfigDescription("Nightstalker cape stamina regen multiplier when cold.", null,
             new AcceptableValueRange<float>(0.01f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            nightstalkerDamageMult = Config.Bind("Server config", "nightstalkerDamageMult", 0.30f,
-            new ConfigDescription("Nightstalker cape damage bonus when requirements met.", null,
-            new AcceptableValueRange<float>(0.01f, 100f),
+            nightstalkerSkill = Config.Bind("Server config", "nightstalkerSkill", 30,
+            new ConfigDescription("Nightstalker cape bow skill bonus during night-time", null,
+            new AcceptableValueRange<int>(0, 100),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+            AdventurerEffect1 = Config.Bind("Server config", "AdventurerEffect1", true,
+            new ConfigDescription("If the adventurer cape makes you always rested.", null,
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            AdventurerEffect2 = Config.Bind("Server config", "AdventurerEffect2", true,
+            new ConfigDescription("If the adventurer cape waives sleeping restrictions.", null,
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             // You can subscribe to a global event when config got synced initially and on changes
@@ -382,16 +400,23 @@ namespace DragoonCapes
         private void AddClonedItems()
         {
             //To-Do Ideas:
-            //Adventurers Cloak status effect update to make perma rested
-            //Change Shaman/Bush cape feather trail effect? (unity model?)
-            //einherjar spear return when thrown
-            //Make shaman cape spell chain casting work when casting with Health
-            //Custom Models?
-            //Config values
+            
+            //Change Shaman/Bush cape feather trail effect? (Custom unity model?)
+            
+            //Midas cape that makes every enemy drop a tiny bit of gold?
+
             //Localization
+            
+            //update Bepinex, valheim references https://jotunnlib.github.io/jotunnlib/tutorials/getting-started.html
+
+            //variable paths that dont rely on the folder being named properly
+            //var CultistIconPath = Path.Combine(Path.GetDirectoryName(Info.Location), "cultistIcon.png");
+            //Jotunn.Logger.LogMessage("Cultist Path: " + CultistIconPath);//message,debug or info?
+            //Sprite CultistIcon = AssetUtils.LoadSpriteFromFile(CultistIconPath);
 
             //Cape Ideas
-            //White lox Cape, rabbit cape
+            //ashlands capes? White ash lox cape?
+            //Rabbit cape, jump twice as high using stalker result method tweaking the jump skill factor
             //demister cape, carry weight cape to provide alternatives for utility slot.
 
             //Read the Server Config to check if status effects are enabled
@@ -400,21 +425,21 @@ namespace DragoonCapes
 
             //Neck Cape-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //Neck Status Effect
-            neckCapeStatus.name = "Neck's Slyness";
-            neckCapeStatus.m_name = "Neck's Slyness";
-            neckCapeStatus.m_tooltip = "A neck in a pond cannot concieve the ocean, but he will still be dry.\n<color=orange>Immune</color> VS <color=orange>Wet</color>";
-            neckCapeStatus.m_startMessage = "The line where the sky meets the sea, it calls me";
+            neckCapeStatus.name = "$status_neckcape";
+            neckCapeStatus.m_name = "$status_neckcape";
+            neckCapeStatus.m_tooltip = "$status_neckcape_tooltip";
+            neckCapeStatus.m_startMessage = "$status_neckcape_startmessage";
             neckCapeStatus.m_skillLevel = Skills.SkillType.Swim;
             neckCapeStatus.m_skillLevelModifier = NeckSkill.Value;
             neckCapeStatus.m_category = "NeckCape";
 
             //Neck Item Config
             ItemConfig neckCapeConf = new ItemConfig();
-            neckCapeConf.Name = "Neck Skin Cape";
-            neckCapeConf.Description = "Neck hide is made for mariners and swamp trekkers. slick and waterproof";
+            neckCapeConf.Name = "$item_neckcape";
+            neckCapeConf.Description = "$item_neckcape_description";
             neckCapeConf.CraftingStation = "forge";
             neckCapeConf.AddRequirement(new RequirementConfig("TrophyNeck", 5, 2));//the 2nd number is upgrade cost per level
-            neckCapeConf.AddRequirement(new RequirementConfig("Guck", 8,3));
+            neckCapeConf.AddRequirement(new RequirementConfig("Guck", 8, 3));
             neckCapeConf.AddRequirement(new RequirementConfig("Iron", 1, 1));
 
             //Sprite and Texture loading
@@ -425,8 +450,13 @@ namespace DragoonCapes
 
             //Make the item as a deer cape mock and assign status effect
             CustomItem NeckCape = new CustomItem("CapeNeck", "CapeDeerHide", neckCapeConf);
-            NeckCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = neckCapeStatus;
 
+            //assign status effects if the config has it enabled
+            if (dragoonCapeEffectsEnabled.Value && NeckWaterproof.Value)
+            {
+                NeckCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = neckCapeStatus;
+            }
+            //add Poison Resist
             HitData.DamageModPair pRes = default(HitData.DamageModPair);
             pRes.m_modifier = HitData.DamageModifier.Resistant;
             pRes.m_type = HitData.DamageType.Poison;
@@ -436,31 +466,25 @@ namespace DragoonCapes
 
             //Cultist Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //Cultist Status Effect
-            cultistCapeStatus.name = "Cultist's Devotion";
-            cultistCapeStatus.m_name = "Cultist's Devotion";
-            cultistCapeStatus.m_tooltip = "The gods of the mountain protect their own.";
-            cultistCapeStatus.m_startMessage = "I am the hand of the darkness. I am it's reach.";
+            cultistCapeStatus.name = "$status_cultistcape";
+            cultistCapeStatus.m_name = "$status_cultistcape";
+            cultistCapeStatus.m_tooltip = "$status_cultistcape_tooltip";
+            cultistCapeStatus.m_startMessage = "$status_cultistcape_startmessage";
             cultistCapeStatus.m_skillLevel = Skills.SkillType.BloodMagic;
             cultistCapeStatus.m_skillLevel2 = Skills.SkillType.Axes;
-            cultistCapeStatus.m_skillLevelModifier = cultistCapeStatus.m_skillLevelModifier2 = CultistSkill.Value;       
+            cultistCapeStatus.m_skillLevelModifier = cultistCapeStatus.m_skillLevelModifier2 = CultistSkill.Value;
             cultistCapeStatus.m_healthRegenMultiplier = CultistRegen.Value;
 
             //Cultist cape item config
             ItemConfig cultistCapeConf = new ItemConfig();
-            cultistCapeConf.Name = "Cultist Cape";
-            cultistCapeConf.Description = "Made from the faithful's fur and some jute. Itchy, but makes you feel warm inside.";
+            cultistCapeConf.Name = "$item_cultistcape";
+            cultistCapeConf.Description = "$item_cultistcape_description";
             cultistCapeConf.CraftingStation = "forge";
             cultistCapeConf.AddRequirement(new RequirementConfig("JuteRed", 10, 4));
             cultistCapeConf.AddRequirement(new RequirementConfig("TrophyFenring", 3, 0));
             cultistCapeConf.AddRequirement(new RequirementConfig("Iron", 1, 1));
 
             //Sprite and Texture loading
-
-            //variable paths that dont rely on the folder being named properly
-            //var CultistIconPath = Path.Combine(Path.GetDirectoryName(Info.Location), "cultistIcon.png");
-            //Jotunn.Logger.LogMessage("Cultist Path: " + CultistIconPath);//message,debug or info?
-            //Sprite CultistIcon = AssetUtils.LoadSpriteFromFile(CultistIconPath);
-
             Sprite CultistIcon = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/cultistIcon.png");
             Texture2D CultistTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/cultistTexture.png");
             cultistCapeConf.Icons = new Sprite[] { CultistIcon };
@@ -468,15 +492,18 @@ namespace DragoonCapes
 
             //Make the item as a lox cape mock and assign status effect
             CustomItem CultistCape = new CustomItem("CapeCultist", "CapeLox", cultistCapeConf);
-            CultistCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = cultistCapeStatus;
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                CultistCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = cultistCapeStatus;
+            }
             ItemManager.Instance.AddItem(CultistCape);
 
             //Dvergr cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //dvergr status effect
-            dvergrCapeStatus.name = "Dvergr Ingenuity";
-            dvergrCapeStatus.m_name = "Dvergr Ingenuity";
-            dvergrCapeStatus.m_tooltip = "The secretive Dvergr know many superior ways to channel Eitr. This cape is the result of a forced sharing of knowledge.";
-            dvergrCapeStatus.m_startMessage = "You love casting spells";
+            dvergrCapeStatus.name = "$status_dvergrcape";
+            dvergrCapeStatus.m_name = "$status_dvergrcape";
+            dvergrCapeStatus.m_tooltip = "$status_dvergrcape_tooltip";
+            dvergrCapeStatus.m_startMessage = "$status_dvergrcape_startmessage";
             dvergrCapeStatus.m_skillLevel = Skills.SkillType.ElementalMagic;
             dvergrCapeStatus.m_skillLevelModifier = 10f;
             dvergrCapeStatus.m_skillLevel2 = Skills.SkillType.Pickaxes;
@@ -486,8 +513,8 @@ namespace DragoonCapes
 
             //dvergr item config
             ItemConfig dvergrCapeConf = new ItemConfig();
-            dvergrCapeConf.Name = "Dvergr Cape";
-            dvergrCapeConf.Description = "Made by inscribing dvergr runes on some jute. Makes you tingle with power when worn.";
+            dvergrCapeConf.Name = "$item_dvergrcape";
+            dvergrCapeConf.Description = "$item_dvergrcape_description";
             dvergrCapeConf.CraftingStation = "piece_magetable";
             dvergrCapeConf.AddRequirement(new RequirementConfig("JuteBlue", 10, 4));
             dvergrCapeConf.AddRequirement(new RequirementConfig("TrophyDvergr", 3, 0));
@@ -501,7 +528,10 @@ namespace DragoonCapes
 
             //Make the item as a lox cape mock and assign status effect
             CustomItem dvergrCape = new CustomItem("CapeDvergr", "CapeLox", dvergrCapeConf);
-            dvergrCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = dvergrCapeStatus;
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                dvergrCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = dvergrCapeStatus;
+            }
 
             //Fire Res instead of frost
             dvergrCape.ItemDrop.m_itemData.m_shared.m_damageModifiers.Clear();
@@ -514,17 +544,17 @@ namespace DragoonCapes
 
             //Shaman cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //shaman status effect
-            shamanCapeStatus.name = "Shaman's Craft";
-            shamanCapeStatus.m_name = "Shaman's Craft";
-            shamanCapeStatus.m_tooltip = "Let the dead past shape the living future.\n<color=orange>Use Health as Eitr</color>";
-            shamanCapeStatus.m_startMessage = "Ekkie Bukaw";
+            shamanCapeStatus.name = "$status_shamancape";
+            shamanCapeStatus.m_name = "$status_shamancape";
+            shamanCapeStatus.m_tooltip = "$status_shamancape_tooltip\n<color=orange>$status_shamancape_tooltip1</color>";
+            shamanCapeStatus.m_startMessage = "$status_shamancape_startmessage";
             //shamanCapeStatus.m_healthRegenMultiplier = 1.05f;//Disabled for balance reasons
             shamanCapeStatus.m_category = "ShamanCape";
 
             //shaman item config
             ItemConfig shamanCapeConf = new ItemConfig();
-            shamanCapeConf.Name = "Shaman Cape";
-            shamanCapeConf.Description = "Chicken Feather cape that brings the tribal energy to you!";
+            shamanCapeConf.Name = "$item_shamancape";
+            shamanCapeConf.Description = "$item_shamancape_description";
             shamanCapeConf.CraftingStation = "piece_artisanstation";
             shamanCapeConf.AddRequirement(new RequirementConfig("Feathers", 10, 4));
             shamanCapeConf.AddRequirement(new RequirementConfig("TrophyGoblinShaman", 3, 0));
@@ -538,23 +568,26 @@ namespace DragoonCapes
 
             //Make the item as a feather cape mock and assign status effect
             CustomItem shamanCape = new CustomItem("CapeShaman", "CapeFeather", shamanCapeConf);
-            shamanCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = shamanCapeStatus;
-            shamanCape.ItemDrop.m_itemData.m_shared.m_trailStartEffect = null;//This doesn't disable the trail?
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                shamanCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = shamanCapeStatus;
+            }
+            shamanCape.ItemDrop.m_itemData.m_shared.m_trailStartEffect = null; // This doesn't disable the trail?
 
             ItemManager.Instance.AddItem(shamanCape);
 
             //Serpent cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //serpent status effect
-            serpentCapeStatus.name = "Serpent's Fang";
-            serpentCapeStatus.m_name = "Serpent's Fang";
-            serpentCapeStatus.m_tooltip = "Venom courses through your veins.\nDamage Bonus as Poison: <color=orange>+"+ SerpentDamageMult.Value*100 + "%</color>";
-            serpentCapeStatus.m_startMessage = "That's cold blooded, man.";
+            serpentCapeStatus.name = "$status_serpentcape";
+            serpentCapeStatus.m_name = "$status_serpentcape";
+            serpentCapeStatus.m_tooltip = "$status_serpentcape_tooltip\n$status_serpentcape_tooltip1<color=orange>+" + SerpentDamageMult.Value * 100 + "%</color>";
+            serpentCapeStatus.m_startMessage = "$status_serpentcape_startmessage";
             serpentCapeStatus.m_category = "SerpentCape";
 
             //serpent item config
             ItemConfig serpentCapeConf = new ItemConfig();
-            serpentCapeConf.Name = "Serpent Cape";
-            serpentCapeConf.Description = "An unusual cape made from the harvests of the sea.";
+            serpentCapeConf.Name = "$item_serpentcape";
+            serpentCapeConf.Description = "$item_serpentcape_description";
             serpentCapeConf.CraftingStation = "piece_workbench";
             serpentCapeConf.AddRequirement(new RequirementConfig("SerpentScale", 10, 4));
             serpentCapeConf.AddRequirement(new RequirementConfig("TrophySerpent", 1, 0));
@@ -568,7 +601,11 @@ namespace DragoonCapes
 
             //Make the item as a feather cape mock and assign status effect
             CustomItem serpentCape = new CustomItem("CapeSerpent", "CapeWolf", serpentCapeConf);
-            serpentCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = serpentCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                serpentCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = serpentCapeStatus;
+            }
 
             //Poison Resistance instead of frost
             serpentCape.ItemDrop.m_itemData.m_shared.m_damageModifiers.Clear();
@@ -581,10 +618,10 @@ namespace DragoonCapes
 
             //Knight Cape-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //knight Status Effect
-            knightCapeStatus.name = "Knight's Honor";
-            knightCapeStatus.m_name = "Knight's Honor";
-            knightCapeStatus.m_tooltip = "Block, Parry, Dodge.\nStagger Resist: <color=orange>+"+KnightStaggerRes.Value*100+"%</color>";
-            knightCapeStatus.m_startMessage = "Thou hast seen nothing yet";
+            knightCapeStatus.name = "$status_knightcape";
+            knightCapeStatus.m_name = "$status_knightcape";
+            knightCapeStatus.m_tooltip = "$status_knightcape_tooltip\n$status_knightcape_tooltip1<color=orange>+" + KnightStaggerRes.Value * 100 + "%</color>";
+            knightCapeStatus.m_startMessage = "$status_knightcape_startmessage";
             knightCapeStatus.m_skillLevel = Skills.SkillType.Blocking;
             knightCapeStatus.m_skillLevel2 = Skills.SkillType.Swords;
             knightCapeStatus.m_skillLevelModifier = knightCapeStatus.m_skillLevelModifier2 = KnightSkill.Value;
@@ -593,8 +630,8 @@ namespace DragoonCapes
 
             //knight Item Config
             ItemConfig knightCapeConf = new ItemConfig();
-            knightCapeConf.Name = "Knight's Cape";
-            knightCapeConf.Description = "A thick knightly cape to bring honor to you. Chivalry isn't Dead yet!";
+            knightCapeConf.Name = "$item_knightcape";
+            knightCapeConf.Description = "$item_knightcape_description";
             knightCapeConf.CraftingStation = "piece_artisanstation";
             knightCapeConf.AddRequirement(new RequirementConfig("CapeLinen", 1, 0));//the 2nd number is upgrade cost per level
             knightCapeConf.AddRequirement(new RequirementConfig("LinenThread", 0, 4));
@@ -610,29 +647,34 @@ namespace DragoonCapes
             Sprite knightIcon5 = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/knightIcon5.png");
             Sprite knightIcon6 = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/knightIcon6.png");
             Texture2D knightTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/knightTexture.png");
-            knightCapeConf.Icons = new Sprite[] {knightIcon1, knightIcon2, knightIcon3, knightIcon4, knightIcon5, knightIcon6};
+            knightCapeConf.Icons = new Sprite[] { knightIcon1, knightIcon2, knightIcon3, knightIcon4, knightIcon5, knightIcon6 };
             knightCapeConf.StyleTex = knightTex;
 
             //Make the item as a linen cape mock and assign status effect
             CustomItem knightCape = new CustomItem("CapeKnight", "CapeLinen", knightCapeConf);
-            knightCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = knightCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                knightCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = knightCapeStatus;
+            }
+
             ItemManager.Instance.AddItem(knightCape);
 
             //Crusader Cape-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //crusader Status Effect
-            crusaderCapeStatus.name = "Crusader's Smite";
-            crusaderCapeStatus.m_name = "Crusader's Smite";
-            crusaderCapeStatus.m_tooltip = "Feel my righteous wrath and repent!.\nSpirit Damage: <color=orange>+"+CrusaderDamageSpirit.Value*100f+"%</color>\nBlunt Damage: <color=orange>+"+CrusaderDamageBlunt.Value*100f+"%</color>";
-            crusaderCapeStatus.m_startMessage = "Deus Vult";
+            crusaderCapeStatus.name = "$status_crusadercape";
+            crusaderCapeStatus.m_name = "$status_crusadercape";
+            crusaderCapeStatus.m_tooltip = "$status_crusadercape_tooltip\n$status_crusadercape_tooltip1<color=orange>+" + CrusaderDamageSpirit.Value * 100f + "%</color>\n$status_crusadercape_tooltip2<color=orange>+" + CrusaderDamageBlunt.Value * 100f + "%</color>";
+            crusaderCapeStatus.m_startMessage = "$status_crusadercape_startmessage";
             crusaderCapeStatus.m_skillLevel = Skills.SkillType.Clubs;
             crusaderCapeStatus.m_skillLevel2 = Skills.SkillType.Run;
-            crusaderCapeStatus.m_skillLevelModifier = crusaderCapeStatus.m_skillLevelModifier2 =CrusaderSkill.Value;
+            crusaderCapeStatus.m_skillLevelModifier = crusaderCapeStatus.m_skillLevelModifier2 = CrusaderSkill.Value;
             crusaderCapeStatus.m_category = "crusaderCape";
 
             //crusader Item Config
             ItemConfig crusaderCapeConf = new ItemConfig();
-            crusaderCapeConf.Name = "Crusader's Cape";
-            crusaderCapeConf.Description = "A thick cape bearing an old sigil you remember from midgard. Undead seem to be afraid of it for some reason.";
+            crusaderCapeConf.Name = "$item_crusadercape";
+            crusaderCapeConf.Description = "$item_crusadercape_description";
             crusaderCapeConf.CraftingStation = "piece_artisanstation";
             crusaderCapeConf.AddRequirement(new RequirementConfig("CapeLinen", 1, 0));//the 2nd number is upgrade cost per level
             crusaderCapeConf.AddRequirement(new RequirementConfig("LinenThread", 0, 4));
@@ -644,27 +686,32 @@ namespace DragoonCapes
             Sprite crusaderIcon2 = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/crusaderIcon2.png");
             Sprite crusaderIcon3 = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/crusaderIcon3.png");
             Texture2D crusaderTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/crusaderTexture.png");
-            crusaderCapeConf.Icons = new Sprite[] {crusaderIcon1, crusaderIcon2, crusaderIcon3};
+            crusaderCapeConf.Icons = new Sprite[] { crusaderIcon1, crusaderIcon2, crusaderIcon3 };
             crusaderCapeConf.StyleTex = crusaderTex;
 
             //Make the item as a linen cape mock and assign status effect
             CustomItem crusaderCape = new CustomItem("CapeCrusader", "CapeLinen", crusaderCapeConf);
-            crusaderCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = crusaderCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                crusaderCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = crusaderCapeStatus;
+            }
+
             ItemManager.Instance.AddItem(crusaderCape);
 
-            //berserk cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //Berserk Cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //berserk status effect
-            berserkCapeStatus.name = "Berserker's Rage";
-            berserkCapeStatus.m_name = "Berserker's Rage";
-            berserkCapeStatus.m_tooltip = "Rage takes over in combat, you are berserk.\nIncreased melee damage depending on missing health.\nMax Damage: <color=orange>+"+BerserkDamageMult.Value*100f+"%</color>";
-            berserkCapeStatus.m_startMessage = "RAAAAAGHHH";
+            berserkCapeStatus.name = "$status_berserkcape";
+            berserkCapeStatus.m_name = "$status_berserkcape";
+            berserkCapeStatus.m_tooltip = "$status_berserkcape_tooltip\n$status_berserkcape_tooltip1<color=orange>+" + BerserkDamageMult.Value * 100f + "%</color>";
+            berserkCapeStatus.m_startMessage = "$status_berserkcape_startmessage";
             berserkCapeStatus.m_category = "berserkCape";
             berserkCapeStatus.m_speedModifier = BerserkMoveSpeed.Value;
 
             //berserk item config
             ItemConfig berserkCapeConf = new ItemConfig();
-            berserkCapeConf.Name = "Berserker Cape";
-            berserkCapeConf.Description = "A bear head cape, insulates against warm and cold alike.";
+            berserkCapeConf.Name = "$item_berserkcape";
+            berserkCapeConf.Description = "$item_berserkcape_description";
             berserkCapeConf.CraftingStation = "piece_workbench";
             berserkCapeConf.AddRequirement(new RequirementConfig("WolfHairBundle", 10, 3));
             berserkCapeConf.AddRequirement(new RequirementConfig("Mushroom", 20, 4));
@@ -678,7 +725,11 @@ namespace DragoonCapes
 
             //Make the item as a feather cape mock and assign status effect
             CustomItem berserkCape = new CustomItem("CapeBerserker", "CapeWolf", berserkCapeConf);
-            berserkCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = berserkCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                berserkCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = berserkCapeStatus;
+            }
 
             //fire res + cold, phys weak
             HitData.DamageModPair pVul = default(HitData.DamageModPair);
@@ -696,20 +747,20 @@ namespace DragoonCapes
 
             ItemManager.Instance.AddItem(berserkCape);
 
-            //bush cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //Bush Cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //bush status effect
-            bushCapeStatus.name = "Bush Appearence";
-            bushCapeStatus.m_name = "Bush Appearance";
-            bushCapeStatus.m_tooltip = "You have the advantage of stealth.\nBow Noise Reduction: <color=orange>+"+(1f - BushNoiseReduction.Value)*100f+"%</color>\nProjectile Velocity: <color=orange>+"+BushVelocity.Value*100f+"%</color>";
-            bushCapeStatus.m_startMessage = "Rustle, rustle, rustle";
+            bushCapeStatus.name = "$status_bushcape";
+            bushCapeStatus.m_name = "$status_bushcape";
+            bushCapeStatus.m_tooltip = "$status_bushcape_tooltip\n$status_bushcape_tooltip1<color=orange>+" + (1f - BushNoiseReduction.Value) * 100f + "%</color>\n$status_bushcape_tooltip2<color=orange>+" + BushVelocity.Value * 100f + "%</color>";
+            bushCapeStatus.m_startMessage = "$status_bushcape_startmessage";
             bushCapeStatus.m_category = "bushCape";
             bushCapeStatus.m_skillLevel = SkillType.Sneak;
             bushCapeStatus.m_skillLevelModifier = 20f;
 
             //bush item config
             ItemConfig bushCapeConf = new ItemConfig();
-            bushCapeConf.Name = "Bush Cape";
-            bushCapeConf.Description = "A cape made of local foliage to blend in. A hunter's best friend.";
+            bushCapeConf.Name = "$item_bushcape";
+            bushCapeConf.Description = "$item_bushcape_description";
             bushCapeConf.CraftingStation = "piece_workbench";
             bushCapeConf.AddRequirement(new RequirementConfig("Wood", 30, 5));
             bushCapeConf.AddRequirement(new RequirementConfig("LeatherScraps", 5, 2));
@@ -723,8 +774,10 @@ namespace DragoonCapes
 
             //Make the item as a feather cape mock and assign status effect
             CustomItem bushCape = new CustomItem("CapeBush", "CapeFeather", bushCapeConf);
-            bushCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = bushCapeStatus;
-
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                bushCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = bushCapeStatus;
+            }
             //fire vuln, no cold res
             bushCape.ItemDrop.m_itemData.m_shared.m_damageModifiers.Clear();
             HitData.DamageModPair fVul = default(HitData.DamageModPair);
@@ -734,12 +787,12 @@ namespace DragoonCapes
 
             ItemManager.Instance.AddItem(bushCape);
 
-            //boar cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //Boar Cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //boar status effect
-            boarCapeStatus.name = "Boar's Vigour";
-            boarCapeStatus.m_name = "Boar's Vigour";
-            boarCapeStatus.m_tooltip = "Fight with the never-ending determination of an angry boar.\nDodge Stamina Discount: <color=orange>"+BoarDodgeMult.Value*100f+"%</color>";
-            boarCapeStatus.m_startMessage = "I'm suddenly very hungry for mushrooms and carrots.";
+            boarCapeStatus.name = "$status_boarcape";
+            boarCapeStatus.m_name = "$status_boarcape";
+            boarCapeStatus.m_tooltip = "$status_boarcape_tooltip\n$status_boarcape_tooltip1<color=orange>" + BoarDodgeMult.Value * 100f + "%</color>";
+            boarCapeStatus.m_startMessage = "$status_boarcape_startmessage";
             //boarCapeStatus.m_healthRegenMultiplier = 1.05f;
             boarCapeStatus.m_staminaRegenMultiplier = BoarRegen.Value;
             boarCapeStatus.m_skillLevel = SkillType.Clubs;
@@ -748,8 +801,8 @@ namespace DragoonCapes
 
             //boar item config
             ItemConfig boarCapeConf = new ItemConfig();
-            boarCapeConf.Name = "Boar Cape";
-            boarCapeConf.Description = "A simple cape made of boar hide, it stands as a template for future capes.";
+            boarCapeConf.Name = "$item_boarcape";
+            boarCapeConf.Description = "$item_boarcape_description";
             boarCapeConf.CraftingStation = "piece_workbench";
             boarCapeConf.AddRequirement(new RequirementConfig("LeatherScraps", 10, 4));
             boarCapeConf.AddRequirement(new RequirementConfig("TrophyBoar", 3, 0));
@@ -763,25 +816,27 @@ namespace DragoonCapes
 
             //Make the item as a feather cape mock and assign status effect
             CustomItem boarCape = new CustomItem("CapeBoar", "CapeDeerHide", boarCapeConf);
-            boarCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = boarCapeStatus;
-
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                boarCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = boarCapeStatus;
+            }
             ItemManager.Instance.AddItem(boarCape);
 
-            //dwarf cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //dwarf status effect
-            dwarfCapeStatus.name = "Greydwarf's Wisdom";
-            dwarfCapeStatus.m_name = "Greydwarf's  Wisdom";
-            dwarfCapeStatus.m_tooltip = "Tap into the knowledge of valheim itself.\nEitr: <color=orange>+"+GreyEitr.Value+"</color>";
-            dwarfCapeStatus.m_startMessage = "I am the greydwarf and I speak for the trees.";
+            //Greydwarf Cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //greydwarf status effect
+            dwarfCapeStatus.name = "$status_dwarfcape";
+            dwarfCapeStatus.m_name = "$status_dwarfcape";
+            dwarfCapeStatus.m_tooltip = "$status_dwarfcape_tooltip\n$status_dwarfcape_tooltip1<color=orange>+" + GreyEitr.Value + "</color>";
+            dwarfCapeStatus.m_startMessage = "$status_dwarfcape_startmessage";
             dwarfCapeStatus.m_category = "dwarfCape";
             dwarfCapeStatus.m_skillLevel = SkillType.ElementalMagic;
             dwarfCapeStatus.m_skillLevel2 = SkillType.BloodMagic;
             dwarfCapeStatus.m_skillLevelModifier = dwarfCapeStatus.m_skillLevelModifier2 = GreySkill.Value;
-            
-            //dwarf item config
+
+            //greydwarf item config
             ItemConfig dwarfCapeConf = new ItemConfig();
-            dwarfCapeConf.Name = "Greydwarf Cape";
-            dwarfCapeConf.Description = "A cape weaved from the greydwarves' druidic magick. It has deep roots.";
+            dwarfCapeConf.Name = "$item_dwarfcape";
+            dwarfCapeConf.Description = "$item_dwarfcape_description";
             dwarfCapeConf.CraftingStation = "piece_workbench";
             dwarfCapeConf.AddRequirement(new RequirementConfig("GreydwarfEye", 15, 5));
             dwarfCapeConf.AddRequirement(new RequirementConfig("TrophyGreydwarfShaman", 1, 0));
@@ -795,25 +850,30 @@ namespace DragoonCapes
 
             //Make the item as a feather cape mock and assign status effect
             CustomItem dwarfCape = new CustomItem("CapeGreydwarf", "CapeOdin", dwarfCapeConf);
-            dwarfCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = dwarfCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                dwarfCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = dwarfCapeStatus;
+            }
+
             dwarfCape.ItemDrop.m_itemData.m_shared.m_dlc = "";
 
             ItemManager.Instance.AddItem(dwarfCape);
 
-            //wraith cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //Wraith Cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //wraith status effect
-            wraithCapeStatus.name = "Wraith's Half-life";
-            wraithCapeStatus.m_name = "Wraith's  Half-life";
-            wraithCapeStatus.m_tooltip = "Gravity seems to touch you less when you have one foot in helheim, but you also can't properly digest food.\nFood Benefits: <color=orange>-" + WraithPenalty.Value * 100f + "%</color>\n<color=orange>Space to Fly</color>";
-            wraithCapeStatus.m_startMessage = "...";
+            wraithCapeStatus.name = "$status_wraithcape";
+            wraithCapeStatus.m_name = "$status_wraithcape";
+            wraithCapeStatus.m_tooltip = "$status_wraithcape_tooltip\n$status_wraithcape_tooltip1<color=orange>-" + WraithPenalty.Value * 100f + "%</color>\n<color=orange>$status_wraithcape_tooltip2</color>";
+            wraithCapeStatus.m_startMessage = "$status_wraithcape_startmessage";
             wraithCapeStatus.m_category = "wraithCape";
-            wraithCapeStatus.m_fallDamageModifier = -2f; //No Fall Damage!
+            wraithCapeStatus.m_fallDamageModifier = -2f; // No Fall Damage!
             wraithCapeStatus.m_maxMaxFallSpeed = WraithFall.Value;
 
             //wraith item config
             ItemConfig wraithCapeConf = new ItemConfig();
-            wraithCapeConf.Name = "Wraith Cape";
-            wraithCapeConf.Description = "A cape that unsettles the stomach to behold. To wear this cape is to embrace death.";
+            wraithCapeConf.Name = "$item_wraithcape";
+            wraithCapeConf.Description = "$item_wraithcape_desc";
             wraithCapeConf.CraftingStation = "forge";
             wraithCapeConf.AddRequirement(new RequirementConfig("Entrails", 15, 5));
             wraithCapeConf.AddRequirement(new RequirementConfig("TrophyWraith", 1, 0));
@@ -827,23 +887,36 @@ namespace DragoonCapes
 
             //Make the item as a feather cape mock and assign status effect
             CustomItem wraithCape = new CustomItem("CapeWraith", "CapeOdin", wraithCapeConf);
-            wraithCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = wraithCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                wraithCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = wraithCapeStatus;
+            }
+
             wraithCape.ItemDrop.m_itemData.m_shared.m_dlc = "";
 
             ItemManager.Instance.AddItem(wraithCape);
 
-            //einherjar cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //Einherjar Cape---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //einherjar status effect
-            einherjarCapeStatus.name = "Einherjar's Valor";
-            einherjarCapeStatus.m_name = "Einherjar's  Valor";
-            einherjarCapeStatus.m_tooltip = "The might of valhalla flows into you to smite their enemies.\nSpear Throw Speed: <color=orange>+"+ (EinherjarVelocity.Value - 1f) *100f+"%</color>\nSpear Lightning Damage: <color=orange>+"+EinherjarDamageMult.Value*100f+ "%</color>\nPolearm Lightning Damage: <color=orange>+"+EinherjarDamageMult.Value*100f+"%</color>";
-            einherjarCapeStatus.m_startMessage = "To Odin may I go once my work is done here...";
+            einherjarCapeStatus.name = "$status_einherjarcape";
+            einherjarCapeStatus.m_name = "$status_einherjarcape";
+            einherjarCapeStatus.m_startMessage = "$status_einherjarcape_startmessage";
             einherjarCapeStatus.m_category = "einherjarCape";
+
+            if (EinherjarEffect.Value)
+            {
+                einherjarCapeStatus.m_tooltip = "$status_einherjarcape_tooltip\n$status_einherjarcape_tooltip1<color=orange>+" + EinherjarDamageMult.Value * 100f + "%</color>\n$status_einherjarcape_tooltip2<color=orange>+" + (EinherjarVelocity.Value - 1f) * 100f + "%</color>\n<color=orange>Infinite spear throw</color>";
+            }
+            else
+            {
+                einherjarCapeStatus.m_tooltip = "$status_einherjarcape_tooltip\n$status_einherjarcape_tooltip1<color=orange>+" + EinherjarDamageMult.Value * 100f + "%</color>\n$status_einherjarcape_tooltip2<color=orange>+" + (EinherjarVelocity.Value - 1f) * 100f + "%</color>";
+            }
 
             //einherjar item config
             ItemConfig einherjarCapeConf = new ItemConfig();
-            einherjarCapeConf.Name = "Einherjar Cape";
-            einherjarCapeConf.Description = "A simple cape that is common in the halls of Valhalla, the all-father smiles down on those wearing this cape.";
+            einherjarCapeConf.Name = "$item_einherjarcape";
+            einherjarCapeConf.Description = "$item_einherjarcape_desc";
             einherjarCapeConf.CraftingStation = "piece_workbench";
             einherjarCapeConf.AddRequirement(new RequirementConfig("MushroomYellow", 10, 5));
             einherjarCapeConf.AddRequirement(new RequirementConfig("Blueberries", 10, 5));
@@ -855,26 +928,32 @@ namespace DragoonCapes
             Texture2D einherjarTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/einherjarTexture.png");
             einherjarCapeConf.Icons = new Sprite[] { einherjarIcon };
             einherjarCapeConf.StyleTex = einherjarTex;
+
             //Make the item as a feather cape mock and assign status effect
             CustomItem einherjarCape = new CustomItem("CapeEinherjar", "CapeOdin", einherjarCapeConf);
-            einherjarCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = einherjarCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                einherjarCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = einherjarCapeStatus;
+            }
+
             einherjarCape.ItemDrop.m_itemData.m_shared.m_dlc = "";
 
             ItemManager.Instance.AddItem(einherjarCape);
 
             //Surtling Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            surtlingCapeStatus.name = "Flames of Muspelheim";
-            surtlingCapeStatus.m_name = "Flames of Muspelheim";
+            surtlingCapeStatus.name = "$status_surtlingcape";
+            surtlingCapeStatus.m_name = "$status_surtlingcape";
             surtlingCapeStatus.m_category = "surtlingCape";
-            surtlingCapeStatus.m_tooltip = "Fire envelops you and helps you fight!\n<color=orange>Permanently Burning</color>\nDamage Bonus as Fire: <color=orange>+"+SurtlingDamageMult.Value*100f+"%</color>";
-            surtlingCapeStatus.m_startMessage = "Fire... Hurts...";
+            surtlingCapeStatus.m_tooltip = "$status_surtlingcape_tooltip\n<color=orange>$status_surtlingcape_tooltip1</color>\n$status_surtlingcape_tooltip2<color=orange>+" + SurtlingDamageMult.Value * 100f + "%</color>";
+            surtlingCapeStatus.m_startMessage = "$status_surtlingcape_startmessage";
 
             ItemConfig surtlingCapeConf = new ItemConfig();
-            surtlingCapeConf.Name = "Surtling Cape";
-            surtlingCapeConf.Description = "Lights you on fire but makes you STRONG, a true berserker's choice. The only way to stop the flames is to remove the cape.";
+            surtlingCapeConf.Name = "$item_surtlingcape";
+            surtlingCapeConf.Description = "$item_surtlingcape_desc";
             surtlingCapeConf.CraftingStation = "forge";
-            surtlingCapeConf.AddRequirement(new RequirementConfig("Coal", 30,5));
-            surtlingCapeConf.AddRequirement(new RequirementConfig("SurtlingCore", 5,1));
+            surtlingCapeConf.AddRequirement(new RequirementConfig("Coal", 30, 5));
+            surtlingCapeConf.AddRequirement(new RequirementConfig("SurtlingCore", 5, 1));
             surtlingCapeConf.AddRequirement(new RequirementConfig("Coins", 666, 66));
             //surtlingCapeConf.AddRequirement(new RequirementConfig("Flametal", 6, 1));
 
@@ -885,7 +964,12 @@ namespace DragoonCapes
             surtlingCapeConf.StyleTex = surtlingTex;
 
             CustomItem surtlingCape = new CustomItem("CapeSurtling", "CapeOdin", surtlingCapeConf);
-            surtlingCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = surtlingCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                surtlingCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = surtlingCapeStatus;
+            }
+
             surtlingCape.ItemDrop.m_itemData.m_shared.m_dlc = "";
 
             HitData.DamageModPair veryFireRes = default(HitData.DamageModPair);
@@ -895,17 +979,18 @@ namespace DragoonCapes
 
             ItemManager.Instance.AddItem(surtlingCape);
 
+
             //Brawler Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            brawlerCapeStatus.name = "Jotunn's Stupor";
-            brawlerCapeStatus.m_name = "Jotunn's Stupor";
+            brawlerCapeStatus.name = "$status_brawlercape";
+            brawlerCapeStatus.m_name = "$status_brawlercape";
             brawlerCapeStatus.m_category = "brawlerCape";
-            brawlerCapeStatus.m_tooltip = "Damage bonus while you have a mead active.\nUnarmed damage bonus after drinking: <color=orange>+"+HrugnirDamageMult.Value*100f+"%</color>";
-            brawlerCapeStatus.m_startMessage = "BRAAAAAAP";
+            brawlerCapeStatus.m_tooltip = "$status_brawlercape_tooltip\n$status_brawlercape_tooltip1<color=orange>+" + HrugnirDamageMult.Value * 100f + "%</color>";
+            brawlerCapeStatus.m_startMessage = "$status_brawlercape_startmessage";
             brawlerCapeStatus.m_addMaxCarryWeight = HrugnirCarryWeight.Value;
 
             ItemConfig brawlerCapeConf = new ItemConfig();
-            brawlerCapeConf.Name = "Hrungnir Cape";
-            brawlerCapeConf.Description = "A jotunn's rage and appetite for beer always win out in a brawl.";
+            brawlerCapeConf.Name = "$item_brawlercape";
+            brawlerCapeConf.Description = "$item_brawlercape_desc";
             brawlerCapeConf.CraftingStation = "piece_cauldron";
             brawlerCapeConf.AddRequirement(new RequirementConfig("Root", 20, 5));
             brawlerCapeConf.AddRequirement(new RequirementConfig("MeadFrostResist", 5));
@@ -918,49 +1003,59 @@ namespace DragoonCapes
             brawlerCapeConf.StyleTex = brawlerTex;
 
             CustomItem brawlerCape = new CustomItem("CapeBrawler", "CapeDeerHide", brawlerCapeConf);
-            brawlerCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = brawlerCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                brawlerCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = brawlerCapeStatus;
+            }
 
             ItemManager.Instance.AddItem(brawlerCape);
 
             //Leech Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            leechCapeStatus.name = "Leech's Greed";
-            leechCapeStatus.m_name = "Leech's Greed";
+            leechCapeStatus.name = "$status_leechcape";
+            leechCapeStatus.m_name = "$status_leechcape";
             leechCapeStatus.m_category = "leechCape";
-            leechCapeStatus.m_tooltip = "You can heal from the blood of your enemies.\nLifesteal: <color=orange>+" + LeechLifesteal.Value * 100f + "%</color>";
-            leechCapeStatus.m_startMessage = "The tang of iron fills your mouth.";
+            leechCapeStatus.m_tooltip = "$status_leechcape_tooltip\n$status_leechcape_tooltip1<color=orange>+" + LeechLifesteal.Value * 100f + "%</color>";
+            leechCapeStatus.m_startMessage = "$status_leechcape_startmessage";
 
-            ItemConfig LeechCapeConf = new ItemConfig();
-            LeechCapeConf.Name = "Leech Cape";
-            LeechCapeConf.Description = "Cape made from sewn together bloodsacs, as well as they can be.";
-            LeechCapeConf.CraftingStation = "piece_workbench";
-            LeechCapeConf.AddRequirement(new RequirementConfig("Bloodbag", 25, 7));
-            LeechCapeConf.AddRequirement(new RequirementConfig("Iron", 5));
-            LeechCapeConf.AddRequirement(new RequirementConfig("Root", 8, 4));
+            ItemConfig leechCapeConf = new ItemConfig();
+            leechCapeConf.Name = "$item_leechcape";
+            leechCapeConf.Description = "$item_leechcape_desc";
+            leechCapeConf.CraftingStation = "piece_workbench";
+            leechCapeConf.AddRequirement(new RequirementConfig("Bloodbag", 25, 7));
+            leechCapeConf.AddRequirement(new RequirementConfig("Iron", 5));
+            leechCapeConf.AddRequirement(new RequirementConfig("Root", 8, 4));
 
             //Sprite and Texture loading
-            Sprite LeechIcon = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/leechIcon.png");
-            Texture2D LeechTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/leechTexture.png");
-            LeechCapeConf.Icons = new Sprite[] { LeechIcon };
-            LeechCapeConf.StyleTex = LeechTex;
+            Sprite leechIcon = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/leechIcon.png");
+            Texture2D leechTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/leechTexture.png");
+            leechCapeConf.Icons = new Sprite[] { leechIcon };
+            leechCapeConf.StyleTex = leechTex;
+
+            CustomItem leechCape = new CustomItem("CapeLeech", "CapeFeather", leechCapeConf);
+            leechCape.ItemDrop.m_itemData.m_shared.m_damageModifiers.Clear(); // No Frost Resist for the swampers
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                leechCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = leechCapeStatus;
+            }
+
+            ItemManager.Instance.AddItem(leechCape);
 
 
-            CustomItem LeechCape = new CustomItem("CapeLeech", "CapeFeather", LeechCapeConf);
-            LeechCape.ItemDrop.m_itemData.m_shared.m_damageModifiers.Clear();//No Frost Resist for the swampers
-            LeechCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = leechCapeStatus;
-
-            ItemManager.Instance.AddItem(LeechCape);
-
-            //stalker Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            stalkerCapeStatus.name = "Stalker's Strike";
-            stalkerCapeStatus.m_name = "Stalker's Strike";
+            //Stalker Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            stalkerCapeStatus.name = "$status_stalkerscape";
+            stalkerCapeStatus.m_name = "$status_stalkerscape";
             stalkerCapeStatus.m_category = "stalkerCape";
-            stalkerCapeStatus.m_tooltip = "The cold fortifies your arm and aim.\nDamage while cold: <color=orange>+" + nightstalkerDamageMult.Value * 100f + "%</color>";
-            stalkerCapeStatus.m_startMessage = "I was born in the dark, molded by it.";
+            stalkerCapeStatus.m_tooltip = "$status_stalkerscape_tooltip";
+            stalkerCapeStatus.m_startMessage = "$status_stalkerscape_startmessage";
             stalkerCapeStatus.m_staminaRegenMultiplier = nightstalkerRegen.Value;
+            stalkerCapeStatus.m_skillLevel = Skills.SkillType.Bows;
+            stalkerCapeStatus.m_skillLevelModifier = nightstalkerSkill.Value;
 
             ItemConfig stalkerCapeConf = new ItemConfig();
-            stalkerCapeConf.Name = "Stalker Cape";
-            stalkerCapeConf.Description = "A pitch black cape to help you blend in during the night.";
+            stalkerCapeConf.Name = "$item_stalkerscape";
+            stalkerCapeConf.Description = "$item_stalkerscape_desc";
             stalkerCapeConf.CraftingStation = "forge";
             stalkerCapeConf.AddRequirement(new RequirementConfig("WolfHairBundle", 15, 5));
             stalkerCapeConf.AddRequirement(new RequirementConfig("Silver", 5));
@@ -972,24 +1067,43 @@ namespace DragoonCapes
             stalkerCapeConf.Icons = new Sprite[] { stalkerIcon };
             stalkerCapeConf.StyleTex = stalkerTex;
 
-
             CustomItem stalkerCape = new CustomItem("CapeStalker", "CapeOdin", stalkerCapeConf);
-            stalkerCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = stalkerCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                stalkerCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = stalkerCapeStatus;
+            }
+
             stalkerCape.ItemDrop.m_itemData.m_shared.m_dlc = "";
 
             ItemManager.Instance.AddItem(stalkerCape);
 
-            //adventurer Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            adventurerCapeStatus.name = "Home away from home.";
-            adventurerCapeStatus.m_name = "Home away from home.";
+
+            //Adventurer Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            adventurerCapeStatus.name = "$status_adventurercape";
+            adventurerCapeStatus.m_name = "$status_adventurercape";
             adventurerCapeStatus.m_category = "adventurerCape";
-            adventurerCapeStatus.m_tooltip = "Home is where the heart is for a true adventurer.\n<color=orange>Always Rested</color>";
-            adventurerCapeStatus.m_startMessage = "Roads go ever on and on.";
-            //Patch update status to add rested if its not there?
+            adventurerCapeStatus.m_startMessage = "$status_adventurercape_startmessage";
+
+            string adventurerTooltip = "$status_adventurercape_tooltip";
+            string adventurerDesc1 = "\n<color=orange>$status_adventurercape_tooltip1</color>";
+            string adventurerDesc2 = "\n<color=orange>$status_adventurercape_tooltip2</color>";
+
+            if (AdventurerEffect1.Value)
+            {
+                adventurerTooltip += adventurerDesc1;
+            }
+
+            if (AdventurerEffect2.Value)
+            {
+                adventurerTooltip += adventurerDesc2;
+            }
+
+            adventurerCapeStatus.m_tooltip = adventurerTooltip;
 
             ItemConfig adventurerCapeConf = new ItemConfig();
-            adventurerCapeConf.Name = "Adventurer Cape";
-            adventurerCapeConf.Description = "A green cloak common among adventurers, travellers and outcasts. It keeps you warm and lets you sleep wherever you like.";
+            adventurerCapeConf.Name = "$item_adventurercape";
+            adventurerCapeConf.Description = "$item_adventurercape_desc";
             adventurerCapeConf.CraftingStation = "piece_workbench";
             adventurerCapeConf.AddRequirement(new RequirementConfig("LoxPelt", 15, 5));
             adventurerCapeConf.AddRequirement(new RequirementConfig("Silver", 5));
@@ -1001,22 +1115,25 @@ namespace DragoonCapes
             adventurerCapeConf.Icons = new Sprite[] { adventurerIcon };
             adventurerCapeConf.StyleTex = adventurerTex;
 
-
             CustomItem adventurerCape = new CustomItem("CapeAdventurer", "CapeLox", adventurerCapeConf);
-            adventurerCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = adventurerCapeStatus;
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                adventurerCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = adventurerCapeStatus;
+            }
 
             ItemManager.Instance.AddItem(adventurerCape);
 
             //Fall Damage Belt-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            featherBeltStatus.name = "Free Fall";
-            featherBeltStatus.m_name = "Free Fall";
-            featherBeltStatus.m_tooltip = "Vikings Rise Up! (And then safely fall!)";
+            featherBeltStatus.name = "$status_featherbelt";
+            featherBeltStatus.m_name = "$status_featherbelt";
+            featherBeltStatus.m_tooltip = "$status_featherbelt_tooltip";
             featherBeltStatus.m_fallDamageModifier = -1f;
             featherBeltStatus.m_maxMaxFallSpeed = 5f;
 
             ItemConfig featherBeltConf = new ItemConfig();
-            featherBeltConf.Name = "Feather Belt";
-            featherBeltConf.Description = "A magic belt that makes you immune to fall damage.";
+            featherBeltConf.Name = "$item_featherbelt";
+            featherBeltConf.Description = "$item_featherbelt_desc";
             featherBeltConf.CraftingStation = "piece_magetable";
             featherBeltConf.AddRequirement(new RequirementConfig("ScaleHide", 10));
             featherBeltConf.AddRequirement(new RequirementConfig("CapeFeather", 1));
@@ -1024,22 +1141,27 @@ namespace DragoonCapes
             //Sprite and Texture loading
             Sprite featherIcon = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/featherBeltIcon.png");
             Texture2D featherTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/featherBeltTexture.png");
-            featherBeltConf.Icons = new Sprite[] {featherIcon};
+            featherBeltConf.Icons = new Sprite[] { featherIcon };
             featherBeltConf.StyleTex = featherTex;
 
             CustomItem featherBelt = new CustomItem("BeltFeather", "BeltStrength", featherBeltConf);
-            featherBelt.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = featherBeltStatus;
-            
-            if(featherBeltEnabled.Value == true)
+
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                featherBelt.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = featherBeltStatus;
+            }
+
+            if (featherBeltEnabled.Value)
             {
                 ItemManager.Instance.AddItem(featherBelt);
             }
 
             //Cleanup
             PrefabManager.OnVanillaPrefabsAvailable -= AddClonedItems;
+
         }
         private void AddArchivedClonedItems()
-        {      
+        {
             //Dragon Breath Staff-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             ItemConfig DragonStaffConf = new ItemConfig();
             DragonStaffConf.Name = "Staff of dragon's breath";
@@ -1058,7 +1180,7 @@ namespace DragoonCapes
 
             CustomItem DragonStaff = new CustomItem("StaffDragon", "StaffFireball", DragonStaffConf);
             ItemManager.Instance.AddItem(DragonStaff);
-            
+
             //mead Belt-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             meadBeltStatus.name = "Mead Buzz";
             meadBeltStatus.m_name = "Mead Buzz";
@@ -1090,6 +1212,6 @@ namespace DragoonCapes
             //Cleanup
             PrefabManager.OnVanillaPrefabsAvailable -= AddArchivedClonedItems;
         }
-    }
+        }
 }
 

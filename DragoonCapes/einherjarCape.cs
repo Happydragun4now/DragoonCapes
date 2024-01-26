@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using static Skills;
+using TMPro;
 
 namespace DragoonCapes
 {
@@ -42,41 +43,38 @@ namespace DragoonCapes
             }
             bool weaponType1 = hit.m_skill == Skills.SkillType.Spears;
             bool weaponType2 = hit.m_skill == Skills.SkillType.Polearms;
-            bool weaponType3 = hit.m_toolTier == 0;//fists are tier 0, but are claws as well?
-            /*
-            bool weaponType1 = player.GetCurrentWeapon().m_shared.m_skillType == Skills.SkillType.Spears;
-            bool weaponType2 = player.GetCurrentWeapon().m_shared.m_skillType == Skills.SkillType.Polearms;
-            bool weaponType3 = player.GetCurrentWeapon() == null;//need something that works for empty handed but not fist weapons so that thrown spear still works
-            */
-            if (hit.GetAttacker() == player && (weaponType1 || weaponType2 || weaponType3))
+            //bool weaponType3 = hit.m_toolTier == 0;//fists are tier 0, makes spear throws add dmg! this has some side effects though.
+            if (hit.GetAttacker() == player && (weaponType1 || weaponType2))
             {
                 hit.m_damage.m_lightning += hit.GetTotalDamage() * DragoonCapes.Instance.EinherjarDamageMult.Value;
             }
         }
-        /*
-        //return on throw somehow IDK
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Projectile), "SpawnOnHit")]
-        public static void Proj_SpawnOnHit_Prefix(Projectile __instance, GameObject go)
-        {
-            Logger.LogInfo("RespawnItemonHit: " + __instance.m_respawnItemOnHit);
-            __instance.m_respawnItemOnHit = false;
-            Logger.LogInfo("RespawnItemonHit2: " + __instance.m_respawnItemOnHit);
 
-            if (go == null)
-            {
-                Logger.LogInfo("gameobject was null");
-                return;
-            }
+        //infinite throw patches
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Projectile), "Setup")]
+        public static void Proj_Setup_Prefix(Projectile __instance)
+        {
+            //this might not play well in MP
             Player player = Player.m_localPlayer;
-            bool haveStatus = player.GetSEMan().HaveStatusEffectCategory("einherjarCape");
-            if (haveStatus)
+            if (DragoonCapes.Instance.EinherjarEffect.Value && player.GetSEMan().HaveStatusEffectCategory("einherjarCape"))
             {
-                Logger.LogInfo("Spear weapon and Einherjar Cape");
-                //player.Pickup(go, true, false);//this was spawning extra spears on the ground
+                //Don't spawn the item drop on hit if einherjar cape
+                __instance.m_respawnItemOnHit = false;
             }
         }
-        */
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Attack), "OnAttackTrigger")]
+        public static void Attack_Postfix(Attack __instance)
+        {
+            //this might not play well in MP
+            Player player = Player.m_localPlayer;
+            if (DragoonCapes.Instance.EinherjarEffect.Value && player.GetSEMan().HaveStatusEffectCategory("einherjarCape") && __instance.GetWeapon()?.m_shared.m_skillType == Skills.SkillType.Spears)
+            {
+                //if its a spear attack and they have the cape on, don't consume the cape
+                __instance.m_consumeItem = false;
+            }
+        }
     }
 
 }

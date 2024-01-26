@@ -16,14 +16,16 @@ namespace DragoonCapes
         [HarmonyPatch(typeof(Character), "AddStaggerDamage")]
         private static void ChangeStaggerRes_Prefix(ref float damage)
         {
-            bool haveStatus = Player.m_localPlayer.GetSEMan().HaveStatusEffectCategory("knightCape");
-            if (haveStatus)
+            Player player = Player.m_localPlayer;
+            if (player == null || player.IsDead())
             {
-                //reduce the damage going to stagger by 25%
-                //Logger.LogInfo("Stagger Damage pre-res: " + damage);
-                damage *= (1-DragoonCapes.Instance.KnightStaggerRes.Value);
-                //Logger.LogInfo("Stagger Damage post-res: " + damage);
+                return;
+            }
 
+            if (player.GetSEMan().HaveStatusEffectCategory("knightCape"))
+            {
+                //reduced added stagger damage when you are getting hit
+                damage *= (1-DragoonCapes.Instance.KnightStaggerRes.Value);
             }
         }
     }

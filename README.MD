@@ -21,6 +21,9 @@
 - Custom models for a few items
 - More Capes
 
+<details>
+<summary>Cape Effect List (spoilers)</summary>
+
 >## Current Capes
 | Cape              | Biome        | Effect                                     |
 | ----------------- | ------------ | -------------------------------------------|
@@ -32,7 +35,7 @@
 | Boar Cape         | Meadows      | Stamina and dodging                        |
 | Bush Cape         | Meadows      | Stealth archery                            |
 | Feather Cape      | Mistlands    | Feather Fall                               |
-| Dvergr Cape       | Mistlands    | Pickaxes Elemental Magic                   |
+| Dvergr Cape       | Mistlands    | Pickaxes, Elemental Magic                   |
 | Cultist Cape      | Mountain     | Axes, Blood Magic                          |
 | Berserker Cape    | Mountain     | Damage bonus depending on missing health   |
 | Wolf Cape         | Mountain     | High armor, spear and polearm skills       |
@@ -48,11 +51,19 @@
 | Wraith Cape       | Swamp        | Weak flying, reduced regeneration          |
 | Leech Cape        | Swamp        | Lifesteal                                  |
 
+</details>
+
 >## Bug Reporting
 You can report issues with the mod at the github page:
 https://github.com/Happydragun4now/DragoonCapes/issues
 
->## Changelog
-1.3.0 - Various Bug fixes for all capes<br>
-1.2.6 - New Icon, also retextured einherjar, wraith capes and fixed a small issue with wraith cape<br>
-1.2.5 - Sleep effect on adventurer cape, spear return effect on einherjar cape, draw speed on nightstalker cape, as well as more consistent descriptions and default balance configs
+<details>
+<summary>Change log (spoilers)</summary>
+1.3.0 - Adventurer bug fixes, add a lot of safety code to all capes to hopefully prevent errors. AI Chinese Localization files<br>
+1.2.9 - Adventurer and Einherjar Balance changes with new config options, some error fixes<br>
+1.2.8 - Localization support and french localization(AI Generated), fixed some config values and added a few new ones<br>
+1.2.7 - Shaman, knight, nightstalker bug fixes<br>
+1.2.6 - New mod Icon, retextured einherjar and wraith capes, small changes to wraith cape<br>
+1.2.5 - Sleep effect on adventurer cape, spear return effect on einherjar cape, draw speed on nightstalker cape, as well as more consistent descriptions and default balance configs<br>
+1.2.4 - Bugfix for linen cape<br>
+</details>

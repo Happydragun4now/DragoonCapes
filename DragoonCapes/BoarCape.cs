@@ -15,6 +15,10 @@ namespace DragoonCapes
         [HarmonyPatch(typeof(Player), "Dodge")]
         private static void Prefix(ref float ___m_dodgeStaminaUsage, ref SEMan ___m_seman)
         {
+            if (___m_seman == null)
+            {
+                return;
+            }
             if (___m_seman.HaveStatusEffectCategory("boarCape"))
             {
                 ___m_dodgeStaminaUsage = baseStaminaUse * Math.Max(0.01f, 1f - DragoonCapes.Instance.BoarDodgeMult.Value);

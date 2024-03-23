@@ -21,7 +21,7 @@ namespace DragoonCapes
         private static void Lifesteal_Prefix(HitData hit)
         {
             Player player = Player.m_localPlayer;
-            if (!player.GetSEMan().HaveStatusEffectCategory("leechCape"))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("leechCape"))
             {
                 return;
             }

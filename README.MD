@@ -53,8 +53,8 @@ You can report issues with the mod at the github page:
 https://github.com/Happydragun4now/DragoonCapes/issues
 
 >## Changelog
-1.2.7 - Shaman, knight, nightstalker bug fixes
+1.3.0 - Various Bug fixes for all capes
 1.2.6 - New Icon, also retextured einherjar, wraith capes and fixed a small issue with wraith cape
 1.2.5 - Sleep effect on adventurer cape, spear return effect on einherjar cape, draw speed on nightstalker cape, as well as more consistent descriptions and default balance configs
-1.2.4 - Bugfix for linen cape
+
 

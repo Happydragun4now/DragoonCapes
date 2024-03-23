@@ -28,7 +28,7 @@ namespace DragoonCapes
     {
         public const string PluginGUID = "com.HappyDragoon.DragoonCapes";
         public const string PluginName = "DragoonCapes";
-        public const string PluginVersion = "1.2.8";
+        public const string PluginVersion = "1.3.0";
 
         public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
 
@@ -112,6 +112,7 @@ namespace DragoonCapes
         public ConfigEntry<float> EinherjarVelocity;
         public ConfigEntry<float> EinherjarDamageMult;
         public ConfigEntry<bool> EinherjarEffect;
+        public ConfigEntry<float> EinherjarCostMult;
 
         public ConfigEntry<float> SurtlingDamageMult;
 
@@ -123,8 +124,9 @@ namespace DragoonCapes
         public ConfigEntry<float> nightstalkerRegen;
         public ConfigEntry<int> nightstalkerSkill;
 
-        public ConfigEntry<bool> AdventurerEffect1;
-        public ConfigEntry<bool> AdventurerEffect2;
+        public ConfigEntry<int> AdventurerComfortBonus;
+        public ConfigEntry<bool> AdventurerEffect;
+        
 
         private void CreateConfigValues()
         {
@@ -321,6 +323,10 @@ namespace DragoonCapes
             new ConfigDescription("Einherjar cape added spear velocity.", null,
             new AcceptableValueRange<float>(1f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            EinherjarCostMult = Config.Bind("Server config", "EinherjarCostMult", 2f,
+            new ConfigDescription("Einherjar cape throwing attack stamina cost multipler. Disabled if effect is false.", null,
+            new AcceptableValueRange<float>(0.01f, 100f),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
             EinherjarEffect = Config.Bind("Server config", "EinherjarEffect", true,
             new ConfigDescription("If infinite throwing spears is enabled.", null,
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
@@ -353,11 +359,12 @@ namespace DragoonCapes
             new AcceptableValueRange<int>(0, 100),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
-            AdventurerEffect1 = Config.Bind("Server config", "AdventurerEffect1", true,
-            new ConfigDescription("If the adventurer cape makes you always rested.", null,
+            AdventurerEffect = Config.Bind("Server config", "AdventurerEffect", true,
+            new ConfigDescription("Adventurer Cape lets you rest anywhere.", null,
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            AdventurerEffect2 = Config.Bind("Server config", "AdventurerEffect2", true,
-            new ConfigDescription("If the adventurer cape waives sleeping restrictions.", null,
+            AdventurerComfortBonus = Config.Bind("Server config", "AdventurerComfortBonus", 10,
+            new ConfigDescription("Adventurer Cape rested duration bonus in minutes.", null,
+            new AcceptableValueRange<int>(0, 1000),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             // You can subscribe to a global event when config got synced initially and on changes
@@ -400,7 +407,7 @@ namespace DragoonCapes
         private void AddClonedItems()
         {
             //To-Do Ideas:
-            
+
             //Change Shaman/Bush cape feather trail effect? (Custom unity model?)
             
             //Midas cape that makes every enemy drop a tiny bit of gold?
@@ -556,6 +563,7 @@ namespace DragoonCapes
             shamanCapeConf.Name = "$item_shamancape";
             shamanCapeConf.Description = "$item_shamancape_description";
             shamanCapeConf.CraftingStation = "piece_artisanstation";
+            shamanCapeConf.MinStationLevel = -3;
             shamanCapeConf.AddRequirement(new RequirementConfig("Feathers", 10, 4));
             shamanCapeConf.AddRequirement(new RequirementConfig("TrophyGoblinShaman", 3, 0));
             shamanCapeConf.AddRequirement(new RequirementConfig("BlackMetal", 1, 1));
@@ -633,6 +641,7 @@ namespace DragoonCapes
             knightCapeConf.Name = "$item_knightcape";
             knightCapeConf.Description = "$item_knightcape_description";
             knightCapeConf.CraftingStation = "piece_artisanstation";
+            knightCapeConf.MinStationLevel = -3;
             knightCapeConf.AddRequirement(new RequirementConfig("CapeLinen", 1, 0));//the 2nd number is upgrade cost per level
             knightCapeConf.AddRequirement(new RequirementConfig("LinenThread", 0, 4));
             knightCapeConf.AddRequirement(new RequirementConfig("Raspberry", 1, 1));
@@ -676,6 +685,7 @@ namespace DragoonCapes
             crusaderCapeConf.Name = "$item_crusadercape";
             crusaderCapeConf.Description = "$item_crusadercape_description";
             crusaderCapeConf.CraftingStation = "piece_artisanstation";
+            crusaderCapeConf.MinStationLevel = -3;
             crusaderCapeConf.AddRequirement(new RequirementConfig("CapeLinen", 1, 0));//the 2nd number is upgrade cost per level
             crusaderCapeConf.AddRequirement(new RequirementConfig("LinenThread", 0, 4));
             crusaderCapeConf.AddRequirement(new RequirementConfig("Raspberry", 10, 5));
@@ -906,7 +916,7 @@ namespace DragoonCapes
 
             if (EinherjarEffect.Value)
             {
-                einherjarCapeStatus.m_tooltip = "$status_einherjarcape_tooltip\n$status_einherjarcape_tooltip1<color=orange>+" + EinherjarDamageMult.Value * 100f + "%</color>\n$status_einherjarcape_tooltip2<color=orange>+" + (EinherjarVelocity.Value - 1f) * 100f + "%</color>\n<color=orange>Infinite spear throw</color>";
+                einherjarCapeStatus.m_tooltip = "$status_einherjarcape_tooltip\n$status_einherjarcape_tooltip1<color=orange>+" + EinherjarDamageMult.Value * 100f + "%</color>\n$status_einherjarcape_tooltip2<color=orange>+" + (EinherjarVelocity.Value - 1f) * 100f + "%</color>\n$status_einherjarcape_tooltip3<color=orange>" + (EinherjarCostMult.Value) * 100f + "%</color>\n<color=orange>$status_einherjarcape_tooltip4</color>";
             }
             else
             {
@@ -1086,15 +1096,15 @@ namespace DragoonCapes
             adventurerCapeStatus.m_startMessage = "$status_adventurercape_startmessage";
 
             string adventurerTooltip = "$status_adventurercape_tooltip";
-            string adventurerDesc1 = "\n<color=orange>$status_adventurercape_tooltip1</color>";
+            string adventurerDesc1 = "\n$status_adventurercape_tooltip1<color=orange>"+AdventurerComfortBonus.Value+"</color>";
             string adventurerDesc2 = "\n<color=orange>$status_adventurercape_tooltip2</color>";
 
-            if (AdventurerEffect1.Value)
+            if (AdventurerComfortBonus.Value > 0)
             {
                 adventurerTooltip += adventurerDesc1;
             }
 
-            if (AdventurerEffect2.Value)
+            if (AdventurerEffect.Value)
             {
                 adventurerTooltip += adventurerDesc2;
             }

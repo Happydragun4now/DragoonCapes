@@ -19,17 +19,19 @@ namespace DragoonCapes
             Player player = Player.m_localPlayer;
             SEMan playerStatus = player.GetSEMan();
 
-            if (playerStatus.HaveStatusEffectCategory("brawlerCape"))
+            if (player == null || player.IsDead() || hit == null || !player.GetSEMan().HaveStatusEffectCategory("brawlerCape"))
             {
-                if (playerStatus.HaveStatusEffectCategory("healthpotion") || playerStatus.HaveStatusEffectCategory("staminapotion") || playerStatus.HaveStatusEffectCategory("eitrpotion") || playerStatus.HaveStatusEffect("Potion_frostresist") || playerStatus.HaveStatusEffect("Potion_poisonresist") || playerStatus.HaveStatusEffect("Potion_tasty"))
+                return;
+            }
+            if (playerStatus.HaveStatusEffectCategory("healthpotion") || playerStatus.HaveStatusEffectCategory("staminapotion") || playerStatus.HaveStatusEffectCategory("eitrpotion") || playerStatus.HaveStatusEffect("Potion_frostresist") || playerStatus.HaveStatusEffect("Potion_poisonresist") || playerStatus.HaveStatusEffect("Potion_tasty"))
+            {
+                if (hit.GetAttacker() == player && (player.GetCurrentWeapon().m_shared.m_skillType == Skills.SkillType.Unarmed))
                 {
-                    if (hit.GetAttacker() == player && (player.GetCurrentWeapon().m_shared.m_skillType == Skills.SkillType.Unarmed))
-                    {
-                        //Logger.LogInfo("Pre-Buff Damage: " + hit.m_damage.GetTotalDamage());
-                        hit.m_damage.Modify(1f+DragoonCapes.Instance.HrugnirDamageMult.Value);
-                    }
+                    //Logger.LogInfo("Pre-Buff Damage: " + hit.m_damage.GetTotalDamage());
+                    hit.m_damage.Modify(1f+DragoonCapes.Instance.HrugnirDamageMult.Value);
                 }
             }
+            
         }
     }
 }

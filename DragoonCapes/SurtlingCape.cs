@@ -22,10 +22,13 @@ namespace DragoonCapes
         [HarmonyPatch(typeof(SE_Burning), "UpdateStatusEffect")]//Start the fire on equip and never let it expire?!
         public static void BurningUpdate_Prefix(ref SE_Burning __instance, float dt)
         {
-            //only do this prefix function stuff if the player has the surtlingBelt on
+            //Null check
             Player player = Player.m_localPlayer;
-            //Logger.LogInfo("__instance vs player burning status:\n" + __instance + "\n" + player.GetSEMan().GetStatusEffect("Burning".GetHashCode()));
-            if (player != null && __instance == player.GetSEMan().GetStatusEffect("Burning".GetHashCode()) && player.GetSEMan().HaveStatusEffectCategory("surtlingCape"))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("surtlingCape"))
+            {
+                return;
+            }
+            if (__instance == player.GetSEMan().GetStatusEffect("Burning".GetHashCode()))
             {
                 //Time-gate the burn to not happen every tick
                 burnTimer += dt;
@@ -46,7 +49,11 @@ namespace DragoonCapes
         private static void FireDamage_Prefix(HitData hit)
         {
             Player player = Player.m_localPlayer;
-            if (hit.GetAttacker() == player && player.GetSEMan().HaveStatusEffectCategory("surtlingCape") && player.GetSEMan().HaveStatusEffect("Burning".GetHashCode()))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("surtlingCape"))
+            {
+                return;
+            }
+            if (hit.GetAttacker() == player && player.GetSEMan().HaveStatusEffect("Burning".GetHashCode()))
             {  
                 hit.m_damage.m_fire += hit.GetTotalDamage() * DragoonCapes.Instance.SurtlingDamageMult.Value;
             }
@@ -59,7 +66,11 @@ namespace DragoonCapes
         private static void ClearAllStatus_Prefix()
         {
             Player player = Player.m_localPlayer;
-            if (player.GetSEMan().HaveStatusEffectCategory("surtlingCape") && !player.GetSEMan().HaveStatusEffect("Burning".GetHashCode()))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("surtlingCape"))
+            {
+                return;
+            }
+            if (!player.GetSEMan().HaveStatusEffect("Burning".GetHashCode()))
             {
                 //Logger.LogInfo("Dealing surtling bonus fire damage!");
                 HitData selfBurn = new HitData();
@@ -72,8 +83,12 @@ namespace DragoonCapes
         [HarmonyPatch(typeof(Player), "UpdateStats", new Type[] { typeof(float) })]
         public static void UpdateStats_Postfix(Player __instance)
         {
+            if (__instance == null || __instance.IsDead() || !__instance.GetSEMan().HaveStatusEffectCategory("surtlingCape"))
+            {
+                return;
+            }
             //If you have the cape on and aren't burning fix that
-            if (!__instance.GetSEMan().HaveStatusEffect("healstaff_cooldown") && __instance.GetSEMan().HaveStatusEffectCategory("surtlingCape") && !__instance.GetSEMan().HaveStatusEffect("Burning"))
+            if (!__instance.GetSEMan().HaveStatusEffect("healstaff_cooldown") && !__instance.GetSEMan().HaveStatusEffect("Burning"))
             {
                 HitData selfBurn = new HitData();
                 selfBurn.m_damage.m_fire = 100f + __instance.GetBodyArmor();//this needs to be high enough to evade armor, therefore its the armor value!

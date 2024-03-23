@@ -17,7 +17,7 @@ namespace DragoonCapes
         private static void ChangeStaggerRes_Prefix(ref float damage)
         {
             Player player = Player.m_localPlayer;
-            if (player == null || player.IsDead())
+            if (player == null || player.IsDead() || damage == null)
             {
                 return;
             }

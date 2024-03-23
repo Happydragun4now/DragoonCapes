@@ -32,27 +32,26 @@ namespace DragoonCapes
         }
         */
 
+        //Patch the firing bow function to change velocity, and noise values
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Attack), "FireProjectileBurst")]
         public static void Attack_FireProjectileBurst_Prefix(Attack __instance)
         {
+            //Checking for null values is really important here
+            //Make sure player is alive, and exists
+            //Make sure the weapon is existant, and the player is wearing the cape
             Player player = Player.m_localPlayer;
-            bool haveStatus = player.GetSEMan().HaveStatusEffectCategory("bushCape");
-            if (haveStatus)
+            if (player == null || player.IsDead() || __instance?.GetWeapon() == null || !player.GetSEMan().HaveStatusEffectCategory("bushCape"))
             {
-                Skills.SkillType? skillType = __instance.GetWeapon()?.m_shared.m_skillType;
-                if (skillType == Skills.SkillType.Bows || skillType == Skills.SkillType.Crossbows)
-                {
-                    //Logger.LogInfo("Pre-buff Speed: " + __instance.m_projectileVel);
-                    __instance.m_projectileVel *= (1f + DragoonCapes.Instance.BushVelocity.Value);
-                    //Logger.LogInfo("Post-buff Speed: " + __instance.m_projectileVel);
-
-                    //Logger.LogInfo("Pre-Buff Noise factor: " + __instance.m_attackStartNoise);
-                    __instance.m_attackStartNoise *= DragoonCapes.Instance.BushNoiseReduction.Value;
-                    __instance.m_attackHitNoise *= DragoonCapes.Instance.BushNoiseReduction.Value;
-                    //Logger.LogInfo("Post-Buff Noise factor: " + __instance.m_attackStartNoise);
-
-                }
+                return;
+            }
+            //Get the skill the weapon uses
+            Skills.SkillType? skillType = __instance.GetWeapon()?.m_shared.m_skillType;
+            if (skillType == Skills.SkillType.Bows || skillType == Skills.SkillType.Crossbows)
+            {
+                __instance.m_projectileVel *= (1f + DragoonCapes.Instance.BushVelocity.Value);
+                __instance.m_attackStartNoise *= DragoonCapes.Instance.BushNoiseReduction.Value;
+                __instance.m_attackHitNoise *= DragoonCapes.Instance.BushNoiseReduction.Value;
             }
         }
     }

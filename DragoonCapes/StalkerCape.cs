@@ -20,12 +20,12 @@ namespace DragoonCapes
         private static void BowSkill_postfix(ref Skills __instance, ref SkillType skillType, ref float __result)
         {
             Player player = Player.m_localPlayer;
-            if (player == null || player.IsDead())
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("stalkerCape"))
             {
                 return;
             }
             //This works but shows the bow skill during the daytime
-            if (skillType == Skills.SkillType.Bows && player.GetSEMan().HaveStatusEffectCategory("stalkerCape"))
+            if (skillType == Skills.SkillType.Bows)
             {
                 if (EnvMan.instance.IsNight())
                 {

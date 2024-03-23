@@ -6,39 +6,41 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Logger = Jotunn.Logger;
+using System.Threading;
 
 namespace DragoonCapes
 {
     [HarmonyPatch]
     internal class AdventurerCape
     {
-        //Rested AF
+        //+X Comfort Level
+        //Type[] needed to seperate ambiguous methods
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(Player), "GetTotalFoodValue", null)]
-        private static void Rested_Postfix()
+        [HarmonyPatch(typeof(SE_Rested), "CalculateComfortLevel", new Type[] { typeof(Player) })]
+        private static void MoreComfort_Postfix(ref int __result, ref Player player)
         {
-            Player player = Player.m_localPlayer;
-
-            //Logger.LogInfo("Adventurer Cape: " + player.GetSEMan().HaveStatusEffectCategory("adventurerCape"));
-            if (DragoonCapes.Instance.AdventurerEffect1.Value && player.GetSEMan().HaveStatusEffectCategory("adventurerCape") && !player.GetSEMan().HaveStatusEffect("Rested"))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("adventurerCape"))
             {
-                player.GetSEMan().AddStatusEffect("Rested".GetHashCode());
+                return;
             }
+            __result += DragoonCapes.Instance.AdventurerComfortBonus.Value;
         }
-        //really it should remove rested on dequip.
+        //Remove Rested on Dequip
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Humanoid), "UnequipItem", null)]
         private static void Unrest_Postfix(ref ItemDrop.ItemData item)
         {
             Player player = Player.m_localPlayer;
-            if (item == null || player == null || item.m_shared.m_equipStatusEffect == null)
+            if (item == null || player == null || player.IsDead() || item.m_shared.m_equipStatusEffect == null /*|| !player.GetSEMan().HaveStatusEffectCategory("adventurerCape")*/)
             {
                 return;
             }
-            //Logger.LogInfo("Adventurer Cape: " + player.GetSEMan().HaveStatusEffectCategory("adventurerCape"));
-            if (DragoonCapes.Instance.AdventurerEffect1.Value && item.m_shared.m_equipStatusEffect.m_category == "adventurerCape" && player.GetSEMan().HaveStatusEffect("Rested"))
+            if (item.m_shared.m_equipStatusEffect.m_category == "adventurerCape" && DragoonCapes.Instance.AdventurerComfortBonus.Value > 0 && player.GetSEMan().HaveStatusEffect("Rested"))
             {
-                player.GetSEMan().RemoveStatusEffect("Rested".GetHashCode());
+                //player.GetSEMan().RemoveStatusEffect("Rested".GetHashCode());
+                //Remove comfort level added x60 seconds from the rested buff when the cape is removed
+                player.GetSEMan().RemoveStatusEffect("Resting".GetHashCode());
+                player.GetSEMan().GetStatusEffect("Rested".GetHashCode()).m_time += DragoonCapes.Instance.AdventurerComfortBonus.Value * 60f;
             }
         }
 
@@ -49,7 +51,11 @@ namespace DragoonCapes
         {
             //if wearing adventurerCape, never check exposure?
             Player player = Player.m_localPlayer;
-            if (DragoonCapes.Instance.AdventurerEffect2.Value && player.GetSEMan().HaveStatusEffectCategory("adventurerCape"))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("adventurerCape"))
+            {
+                return;
+            }
+            if (DragoonCapes.Instance.AdventurerEffect.Value)
             {
                 __result = true;
             }
@@ -61,7 +67,11 @@ namespace DragoonCapes
         {
             //if wearing adventurerCape, never check exposure?
             Player player = Player.m_localPlayer;
-            if (DragoonCapes.Instance.AdventurerEffect2.Value && player.GetSEMan().HaveStatusEffectCategory("adventurerCape"))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("adventurerCape"))
+            {
+                return;
+            }
+            if (DragoonCapes.Instance.AdventurerEffect.Value)
             {
                 __result = true;
             }

@@ -24,10 +24,11 @@ namespace DragoonCapes
             public static void Postfix(Player __instance, ref float ___m_maxAirAltitude, ref Rigidbody ___m_body)
             {
                 //Process flying stuff if wearing wraithCape
-                if (__instance != null && __instance.GetSEMan().HaveStatusEffectCategory("wraithCape"))
+                if (__instance == null || __instance.IsDead() || !__instance.GetSEMan().HaveStatusEffectCategory("wraithCape"))
                 {
-                    Process_Input(__instance, ref ___m_body, ref ___m_maxAirAltitude);
+                    return;
                 }
+                Process_Input(__instance, ref ___m_body, ref ___m_maxAirAltitude);
             }
         }
 
@@ -48,9 +49,15 @@ namespace DragoonCapes
                 //Up and Down input
                 if (ZInput.GetButton("Jump") || ZInput.GetButton("JoyJump"))
                 {
-                    b.y = num/2.5f;
+                    b.y = num / 2.5f;
                 }
-                else//no else if crouching to go down because you cant crouch when flying and keycode makes errors
+                /*
+                if (ZInput.GetKeyDown(KeyCode.LeftControl))
+                {
+                    b.y = -num / 2.5f;
+                }
+                */
+                else
                 {
                     b.y = 0f - DragoonCapes.Instance.WraithVel.Value/1.5f;
                 }

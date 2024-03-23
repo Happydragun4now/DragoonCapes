@@ -22,13 +22,14 @@ namespace DragoonCapes
         {
             public static bool Prefix(SEMan __instance, int nameHash)
             {
+                if(__instance == null || !__instance.HaveStatusEffectCategory("NeckCape") || !__instance.HaveStatusEffectCategory("surtlingCape"))
+                {
+                    return true;
+                }
                 //Wet Can't be applied if you have the NeckCape
                 if (nameHash == "Wet".GetHashCode())
                 {
-                    if (__instance.HaveStatusEffectCategory("NeckCape") || __instance.HaveStatusEffectCategory("surtlingCape"))//surtling cape added here bc lazy
-                    {
-                        return false;
-                    }
+                    return false;
                 }
                 return true;
             }

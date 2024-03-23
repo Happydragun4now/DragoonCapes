@@ -26,12 +26,11 @@ namespace DragoonCapes
             public static void Attack_ChangeCosts_Prefix(ref Attack __instance, ref ItemDrop.ItemData weapon)
             {
                 Player player = Player.m_localPlayer;
-                if (player == null || player.IsDead())
+                if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("ShamanCape"))
                 {
                     return;
                 }
-
-                if (player.GetSEMan().HaveStatusEffectCategory("ShamanCape") && weapon.m_shared.m_attack.m_attackEitr > player.GetEitr())
+                if (weapon.m_shared.m_attack.m_attackEitr > player.GetEitr())
                 {
                     float curEitr = player.GetEitr();
                     float healthCost = weapon.m_shared.m_attack.m_attackEitr - curEitr;//health cost is the eitr cost - the eitr it will tak

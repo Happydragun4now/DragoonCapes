@@ -17,8 +17,12 @@ namespace DragoonCapes
         private static void Spirit_Prefix(HitData hit)
         {
             Player player = Player.m_localPlayer;
+            if (player == null || player.IsDead() || hit == null || !player.GetSEMan().HaveStatusEffectCategory("crusaderCape"))
+            {
+                return;
+            }
             //Logger.LogInfo("Have crusader status: "+player.GetSEMan().HaveStatusEffectCategory("crusaderCape"));
-            if (hit.GetAttacker() == player && player.GetSEMan().HaveStatusEffectCategory("crusaderCape"))
+            if (hit.GetAttacker() == player)
             {
                 //Logger.LogInfo("Adding Spirit Damage");
                 float initialTotal = hit.GetTotalDamage();

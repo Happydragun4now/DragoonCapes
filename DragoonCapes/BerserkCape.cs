@@ -17,7 +17,11 @@ namespace DragoonCapes
         private static void Damage_Prefix(HitData hit)
         {
             Player player = Player.m_localPlayer;
-            if (hit.GetAttacker() == player && player.GetSEMan().HaveStatusEffectCategory("berserkCape") && !hit.m_ranged /*&& player.GetCurrentWeapon().IsTwoHanded()*/)
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("berserkCape"))
+            {
+                return;
+            }
+            if (hit.GetAttacker() == player && !hit.m_ranged /*&& player.GetCurrentWeapon().IsTwoHanded()*/)
             {
                 float missingHealth = 1f - player.GetHealthPercentage();
                 //Logger.LogInfo("Missing Health: " + missingHealth);

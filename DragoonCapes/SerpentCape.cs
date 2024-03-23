@@ -17,7 +17,11 @@ namespace DragoonCapes
             private static void Prefix(HitData hit)
             {
                 Player player = Player.m_localPlayer;
-                if (hit.GetAttacker() == player && player.GetSEMan().HaveStatusEffectCategory("SerpentCape"))
+                if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("SerpentCape"))
+                {
+                    return;
+                }
+                if (hit.GetAttacker() == player)
                 {
                    hit.m_damage.m_poison += hit.GetTotalDamage() * DragoonCapes.Instance.SerpentDamageMult.Value;
                 }

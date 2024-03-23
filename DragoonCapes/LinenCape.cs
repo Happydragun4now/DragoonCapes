@@ -17,15 +17,11 @@ namespace DragoonCapes
             [HarmonyPatch(typeof(Attack), "FireProjectileBurst")]
             public static void Attack_FireProjectileBurst_Prefix(Attack __instance)
             {
-                //if not a weapon, return
-                if (__instance?.GetWeapon() == null || !(__instance.GetWeapon()?.GetDamage()).HasValue)
-                {
-                    return;
-                }
-                //if not a cape that effects this, return
+                //Checking for null values is really important here
+                //Make sure player is alive, and exists
+                //Make sure the weapon is existant, and the player is wearing the cape
                 Player player = Player.m_localPlayer;
-                bool haveStatus = player.GetSEMan().HaveStatusEffectCategory("LinenCape");
-                if (!haveStatus)
+                if (player == null || player.IsDead() || __instance?.GetWeapon() == null || !(__instance.GetWeapon()?.GetDamage()).HasValue || !player.GetSEMan().HaveStatusEffectCategory("LinenCape"))
                 {
                     return;
                 }
@@ -38,14 +34,14 @@ namespace DragoonCapes
                 bool bowskill = (skillType == Skills.SkillType.Bows || skillType == Skills.SkillType.Crossbows);
                 //Linen Cape
                 //splitshot if bow or staff:
-                if (haveStatus && ((bow && bowskill) || (twohand && magic)))
+                if (((bow && bowskill) || (twohand && magic)))
                 {
                     if (__instance.m_projectileAccuracy < 3f)
                     {
                         __instance.m_projectileAccuracy = 3f;
                     }
-                    //Only Apply for things without multishot, also stops looping attacks like frost staff from breaking
-                    if (__instance.m_projectiles == 1)
+                    //Only Apply for things without multishot, also only do the first round of the burst or else it scales exponentially
+                    if (__instance.m_projectileBurstsFired == 0)//OLD: __instance.m_projectiles == 1
                     {
                         __instance.m_damageMultiplier *= DragoonCapes.Instance.LinenDamageMult.Value;
                         __instance.m_projectiles *= DragoonCapes.Instance.LinenProjs.Value;
@@ -57,13 +53,11 @@ namespace DragoonCapes
             [HarmonyPatch(typeof(Attack), "DoMeleeAttack")]
             public static void Attack_DoMeleeAttack_Prefix(Attack __instance)
             {
-                if (__instance?.GetWeapon() == null || !(__instance.GetWeapon()?.GetDamage()).HasValue)
-                {
-                    return;
-                }
+                //Checking for null values is really important here
+                //Make sure player is alive, and exists
+                //Make sure the weapon is existant, and the player is wearing the cape
                 Player player = Player.m_localPlayer;
-                bool haveStatus = player.GetSEMan().HaveStatusEffectCategory("LinenCape");
-                if (!haveStatus)
+                if (player == null || player.IsDead() || __instance?.GetWeapon() == null || !(__instance.GetWeapon()?.GetDamage()).HasValue || !player.GetSEMan().HaveStatusEffectCategory("LinenCape"))
                 {
                     return;
                 }
@@ -71,7 +65,7 @@ namespace DragoonCapes
                 Skills.SkillType? skillType = __instance.GetWeapon()?.m_shared.m_skillType;
                 bool weapon = itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon || itemType == ItemDrop.ItemData.ItemType.TwoHandedWeapon;
                 bool melee = (skillType == Skills.SkillType.Swords || skillType == Skills.SkillType.Polearms || skillType == Skills.SkillType.Axes || skillType == Skills.SkillType.Spears || skillType == Skills.SkillType.Clubs || skillType == Skills.SkillType.Knives);
-                if (haveStatus && weapon && melee)
+                if (weapon && melee)
                 {
                     __instance.m_staggerMultiplier += DragoonCapes.Instance.LinenStagger.Value;
                 }

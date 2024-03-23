@@ -41,7 +41,7 @@ namespace DragoonCapes
             //Make sure player is alive, and exists
             //Make sure the weapon is existant, and the player is wearing the cape
             Player player = Player.m_localPlayer;
-            if (player == null || player.IsDead() || __instance?.GetWeapon() == null || !player.GetSEMan().HaveStatusEffectCategory("bushCape"))
+            if (player == null || player.IsDead() || __instance == null || __instance?.GetWeapon() == null || !player.GetSEMan().HaveStatusEffectCategory("bushCape"))
             {
                 return;
             }

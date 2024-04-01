@@ -59,6 +59,7 @@ https://github.com/Happydragun4now/DragoonCapes/issues
 
 <details>
 <summary>Change log (spoilers)</summary>
+1.3.1 - Brawler and Knight Cape bug fix, Korean translation thanks to So1207<br>
 1.3.0 - Adventurer bug fixes, add a lot of safety code to all capes to hopefully prevent errors. AI Chinese Localization files<br>
 1.2.9 - Adventurer and Einherjar Balance changes with new config options, some error fixes<br>
 1.2.8 - Localization support and french localization(AI Generated), fixed some config values and added a few new ones<br>

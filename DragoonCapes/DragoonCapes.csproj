@@ -58,8 +58,8 @@
     </BuildDependsOn>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /R/Y/E/I "F:\ValheimModding\DragoonCapes\DragoonCapes\Assets\*" "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\HappyDragoon-DragoonCapes\"
-xcopy /R/Y/E/I/F "F:\ValheimModding\DragoonCapes\DragoonCapes\bin\Debug\net48\DragoonCapes.dll" "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\HappyDragoon-DragoonCapes\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /R/Y/E/I "F:\ValheimModding\DragoonCapesGit\DragoonCapes\Assets\*" "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\HappyDragoon-DragoonCapes\"
+xcopy /R/Y/E/I/F "F:\ValheimModding\DragoonCapesGit\DragoonCapes\bin\Debug\net48\DragoonCapes.dll" "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\HappyDragoon-DragoonCapes\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyTitle>DragoonCapes</AssemblyTitle>

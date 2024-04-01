@@ -28,7 +28,7 @@ namespace DragoonCapes
     {
         public const string PluginGUID = "com.HappyDragoon.DragoonCapes";
         public const string PluginName = "DragoonCapes";
-        public const string PluginVersion = "1.3.0";
+        public const string PluginVersion = "1.3.1";
 
         public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
 

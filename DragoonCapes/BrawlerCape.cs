@@ -17,12 +17,11 @@ namespace DragoonCapes
         private static void JotunnPunch_Prefix(HitData hit)
         {
             Player player = Player.m_localPlayer;
-            SEMan playerStatus = player.GetSEMan();
-
             if (player == null || player.IsDead() || hit == null || !player.GetSEMan().HaveStatusEffectCategory("brawlerCape"))
             {
                 return;
             }
+            SEMan playerStatus = player.GetSEMan();
             if (playerStatus.HaveStatusEffectCategory("healthpotion") || playerStatus.HaveStatusEffectCategory("staminapotion") || playerStatus.HaveStatusEffectCategory("eitrpotion") || playerStatus.HaveStatusEffect("Potion_frostresist") || playerStatus.HaveStatusEffect("Potion_poisonresist") || playerStatus.HaveStatusEffect("Potion_tasty"))
             {
                 if (hit.GetAttacker() == player && (player.GetCurrentWeapon().m_shared.m_skillType == Skills.SkillType.Unarmed))

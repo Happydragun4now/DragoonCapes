@@ -28,7 +28,7 @@ namespace DragoonCapes
     {
         public const string PluginGUID = "com.HappyDragoon.DragoonCapes";
         public const string PluginName = "DragoonCapes";
-        public const string PluginVersion = "1.3.1";
+        public const string PluginVersion = "1.3.2";
 
         public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
 
@@ -54,9 +54,10 @@ namespace DragoonCapes
         public ConfigEntry<bool> dragoonCapeEffectsEnabled;
         public ConfigEntry<bool> featherBeltEnabled;
 
-        public ConfigEntry<int> WolfArmor;
-        public ConfigEntry<int> WolfArmorPerLevel;
+        //public ConfigEntry<int> WolfArmor;
+        //public ConfigEntry<int> WolfArmorPerLevel;
         public ConfigEntry<int> WolfSkill;
+        public ConfigEntry<float> WolfStam;
 
         public ConfigEntry<float> DeerMoveSpeed;
         public ConfigEntry<int> DeerSkill;
@@ -99,7 +100,7 @@ namespace DragoonCapes
 
         public ConfigEntry<int> BoarSkill;
         public ConfigEntry<float> BoarRegen;
-        public ConfigEntry<float> BoarDodgeMult;
+        public ConfigEntry<float> BoarDodgeDiscount;
 
         public ConfigEntry<int> GreySkill;
         public ConfigEntry<float> GreyEitr;
@@ -126,7 +127,15 @@ namespace DragoonCapes
 
         public ConfigEntry<int> AdventurerComfortBonus;
         public ConfigEntry<bool> AdventurerEffect;
-        
+
+        public ConfigEntry<float> RabbitSpeed;
+        public ConfigEntry<int> RabbitSkill;
+        public ConfigEntry<int> RabbitArmor;
+        public ConfigEntry<int> RabbitArmorPerLevel;
+
+        public ConfigEntry<float> RustedSpeed;
+        public ConfigEntry<int> RustedArmor;
+        public ConfigEntry<int> RustedArmorPerLevel;
 
         private void CreateConfigValues()
         {
@@ -143,21 +152,18 @@ namespace DragoonCapes
             new ConfigDescription("$featherBeltEnabled", null,
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
-            WolfArmor = Config.Bind("Server config", "WolfArmor", 4,
-            new ConfigDescription("Wolf cape base armor.", null,
-            new AcceptableValueRange<int>(0, 100),
-            new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            WolfArmorPerLevel = Config.Bind("Server config", "WolfArmorPerLevel", 2,
-            new ConfigDescription("Wolf cape armor increase per Level", null,
-            new AcceptableValueRange<int>(0, 100),
-            new ConfigurationManagerAttributes { IsAdminOnly = true }));
             WolfSkill = Config.Bind("Server config", "WolfSkill", 10,
             new ConfigDescription("Wolf cape skill bonuses", null,
             new AcceptableValueRange<int>(0, 100),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            WolfStam = Config.Bind("Server config", "WolfStam", 0.15f,
+            new ConfigDescription("Wolf cape attack stamina reduction", null,
+            new AcceptableValueRange<float>(0.01f, 1f),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
 
             DeerMoveSpeed = Config.Bind("Server config", "DeerMoveSpeed", 0.05f,
-            new ConfigDescription("Deer cape nove speed multipler bonus.", null,
+            new ConfigDescription("Deer cape move speed multipler bonus.", null,
             new AcceptableValueRange<int>(0, 100),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
             DeerSkill = Config.Bind("Server config", "DeerSkill", 10,
@@ -283,8 +289,8 @@ namespace DragoonCapes
             new ConfigDescription("Boar cape stamina regen multiplier.", null,
             new AcceptableValueRange<float>(0.01f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            BoarDodgeMult = Config.Bind("Server config", "BoarDodgeMult", 0.3f,
-            new ConfigDescription("Boar cape dodge stamina discount.", null,
+            BoarDodgeDiscount = Config.Bind("Server config", "BoarDodgeMult", 0.25f,
+            new ConfigDescription("The stamina discount to apply to the boar cape", null,
             new AcceptableValueRange<float>(0.01f, 1f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
@@ -367,6 +373,36 @@ namespace DragoonCapes
             new AcceptableValueRange<int>(0, 1000),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
+            RabbitSpeed = Config.Bind("Server config", "RabbitSpeed", 0.15f,
+            new ConfigDescription("Rabbit Cape movement speed bonus.", null,
+            new AcceptableValueRange<float>(0, 1),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            RabbitSkill = Config.Bind("Server config", "RabbitSkill", 20,
+            new ConfigDescription("Rabbit Cape jump skill bonus", null,
+            new AcceptableValueRange<int>(0, 100),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            RabbitArmor = Config.Bind("Server config", "RabbitArmor", 4,
+            new ConfigDescription("Rabbit cape base armor.", null,
+            new AcceptableValueRange<int>(0, 100),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            RabbitArmorPerLevel = Config.Bind("Server config", "RabbitArmorPerLevel", 1,
+            new ConfigDescription("Rabbit cape armor increase per Level", null,
+            new AcceptableValueRange<int>(0, 100),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+            RustedSpeed = Config.Bind("Server config", "RustedSpeed", -0.2f,
+            new ConfigDescription("Rusted cape speed modifier.", null,
+            new AcceptableValueRange<float>(-1f, 1f),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            RustedArmor = Config.Bind("Server config", "RustedArmor", 12,
+            new ConfigDescription("Rusted cape base armor.", null,
+            new AcceptableValueRange<int>(0, 100),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            RustedArmorPerLevel = Config.Bind("Server config", "RustedArmorPerLevel", 5,
+            new ConfigDescription("Rusted cape armor increase per Level", null,
+            new AcceptableValueRange<int>(0, 100),
+            new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
             // You can subscribe to a global event when config got synced initially and on changes
             SynchronizationManager.OnConfigurationSynchronized += (obj, attr) =>
             {
@@ -400,6 +436,8 @@ namespace DragoonCapes
         private static SE_Stats leechCapeStatus = ScriptableObject.CreateInstance<SE_Stats>();
         private static SE_Stats stalkerCapeStatus = ScriptableObject.CreateInstance<SE_Stats>();
         private static SE_Stats adventurerCapeStatus = ScriptableObject.CreateInstance<SE_Stats>();
+        private static SE_Stats rabbitCapeStatus = ScriptableObject.CreateInstance<SE_Stats>();
+        private static SE_Stats rustedCapeStatus = ScriptableObject.CreateInstance<SE_Stats>();
         private static SE_Stats featherBeltStatus = ScriptableObject.CreateInstance<SE_Stats>();
         private static SE_Stats meadBeltStatus = ScriptableObject.CreateInstance<SE_Stats>();//archived
 
@@ -409,11 +447,7 @@ namespace DragoonCapes
             //To-Do Ideas:
 
             //Change Shaman/Bush cape feather trail effect? (Custom unity model?)
-            
-            //Midas cape that makes every enemy drop a tiny bit of gold?
 
-            //Localization
-            
             //update Bepinex, valheim references https://jotunnlib.github.io/jotunnlib/tutorials/getting-started.html
 
             //variable paths that dont rely on the folder being named properly
@@ -422,14 +456,26 @@ namespace DragoonCapes
             //Sprite CultistIcon = AssetUtils.LoadSpriteFromFile(CultistIconPath);
 
             //Cape Ideas
-            //ashlands capes? White ash lox cape?
-            //Rabbit cape, jump twice as high using stalker result method tweaking the jump skill factor
+            //1 Meadows
+            //
+
+            //1 Ashlands
+            //White ash lox cape?
+
+            //1 Swamp
+            //Rusted cape, high armor, slower movement
+
+            //3 Ocean
+            //Pufferfish ocean cape? Thorns effect?
+            //Pirate lord coat?
+
             //demister cape, carry weight cape to provide alternatives for utility slot.
+            //Some kind of looting cape? Midas cape that makes every enemy drop a tiny bit of gold?
 
             //Read the Server Config to check if status effects are enabled
             bool statuses = (bool)Config["Server config", "dragoonCapeEffectsEnabled"].BoxedValue;
             Logger.LogWarning("Mod Statuses Enabled: " + statuses);
-
+            
             //Neck Cape-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             //Neck Status Effect
             neckCapeStatus.name = "$status_neckcape";
@@ -446,10 +492,12 @@ namespace DragoonCapes
             neckCapeConf.Description = "$item_neckcape_description";
             neckCapeConf.CraftingStation = "forge";
             neckCapeConf.AddRequirement(new RequirementConfig("TrophyNeck", 5, 2));//the 2nd number is upgrade cost per level
-            neckCapeConf.AddRequirement(new RequirementConfig("Guck", 8, 3));
-            neckCapeConf.AddRequirement(new RequirementConfig("Iron", 1, 1));
+            neckCapeConf.AddRequirement(new RequirementConfig("Feathers", 8, 3));
+            neckCapeConf.AddRequirement(new RequirementConfig("Flint", 6, 2));
 
             //Sprite and Texture loading
+            string modPath = Path.GetDirectoryName(Info.Location);
+            //Logger.LogError(Path.Combine(modPath, "Assets\\neckIcon.jpg"));
             Sprite NeckIcon = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/neckIcon.png");
             Texture2D NeckTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/neckTexture.png");
             neckCapeConf.Icons = new Sprite[] { NeckIcon };
@@ -801,7 +849,7 @@ namespace DragoonCapes
             //boar status effect
             boarCapeStatus.name = "$status_boarcape";
             boarCapeStatus.m_name = "$status_boarcape";
-            boarCapeStatus.m_tooltip = "$status_boarcape_tooltip\n$status_boarcape_tooltip1<color=orange>" + BoarDodgeMult.Value * 100f + "%</color>";
+            boarCapeStatus.m_tooltip = "$status_boarcape_tooltip";
             boarCapeStatus.m_startMessage = "$status_boarcape_startmessage";
             //boarCapeStatus.m_healthRegenMultiplier = 1.05f;
             boarCapeStatus.m_staminaRegenMultiplier = BoarRegen.Value;
@@ -829,6 +877,7 @@ namespace DragoonCapes
             if (dragoonCapeEffectsEnabled.Value)
             {
                 boarCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = boarCapeStatus;
+                boarCape.ItemDrop.m_itemData.m_shared.m_dodgeStaminaModifier = BoarDodgeDiscount.Value * -1f;
             }
             ItemManager.Instance.AddItem(boarCape);
 
@@ -963,7 +1012,7 @@ namespace DragoonCapes
             surtlingCapeConf.Description = "$item_surtlingcape_desc";
             surtlingCapeConf.CraftingStation = "forge";
             surtlingCapeConf.AddRequirement(new RequirementConfig("Coal", 30, 5));
-            surtlingCapeConf.AddRequirement(new RequirementConfig("SurtlingCore", 5, 1));
+            surtlingCapeConf.AddRequirement(new RequirementConfig("FlametalNew", 5, 1));
             surtlingCapeConf.AddRequirement(new RequirementConfig("Coins", 666, 66));
             //surtlingCapeConf.AddRequirement(new RequirementConfig("Flametal", 6, 1));
 
@@ -1042,8 +1091,9 @@ namespace DragoonCapes
             leechCapeConf.Icons = new Sprite[] { leechIcon };
             leechCapeConf.StyleTex = leechTex;
 
-            CustomItem leechCape = new CustomItem("CapeLeech", "CapeFeather", leechCapeConf);
+            CustomItem leechCape = new CustomItem("CapeLeech", "CapeAsksvin", leechCapeConf);
             leechCape.ItemDrop.m_itemData.m_shared.m_damageModifiers.Clear(); // No Frost Resist for the swampers
+            leechCape.ItemDrop.m_itemData.m_shared.m_dodgeStaminaModifier = 0f;
 
             if (dragoonCapeEffectsEnabled.Value)
             {
@@ -1133,6 +1183,76 @@ namespace DragoonCapes
             }
 
             ItemManager.Instance.AddItem(adventurerCape);
+
+            //Rabbit Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //Needs translation and texture/icon
+            rabbitCapeStatus.name = "$status_rabbitcape";
+            rabbitCapeStatus.m_name = "$status_rabbitcape";
+            rabbitCapeStatus.m_category = "rabbitCape";
+            rabbitCapeStatus.m_startMessage = "$status_rabbitcape_startmessage";
+            rabbitCapeStatus.m_tooltip = "$status_rabbitcape_tooltip";
+            rabbitCapeStatus.m_skillLevel = Skills.SkillType.Jump;
+            rabbitCapeStatus.m_skillLevel2 = Skills.SkillType.Swim;
+            rabbitCapeStatus.m_skillLevelModifier = RabbitSkill.Value;
+            rabbitCapeStatus.m_skillLevelModifier2 = RabbitSkill.Value;
+            rabbitCapeStatus.m_speedModifier = RabbitSpeed.Value;
+
+            ItemConfig rabbitCapeConf = new ItemConfig();
+            rabbitCapeConf.Name = "$item_rabbitcape";
+            rabbitCapeConf.Description = "$item_rabbitcape_desc";
+            rabbitCapeConf.CraftingStation = "piece_workbench";
+            rabbitCapeConf.AddRequirement(new RequirementConfig("ScaleHide", 15, 10));
+            rabbitCapeConf.AddRequirement(new RequirementConfig("Eitr", 20, 3));
+            rabbitCapeConf.AddRequirement(new RequirementConfig("TrophyHare", 3, 1));
+
+            //Sprite and Texture loading
+            Sprite rabbitIcon = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/rabbitIcon.png");
+            Texture2D rabbitTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/rabbitTexture.png");
+            rabbitCapeConf.Icons = new Sprite[] { rabbitIcon };
+            rabbitCapeConf.StyleTex = rabbitTex;
+
+            CustomItem rabbitCape = new CustomItem("CapeRabbit", "CapeWolf", rabbitCapeConf);
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                rabbitCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = rabbitCapeStatus;
+                rabbitCape.ItemDrop.m_itemData.m_shared.m_armor = RabbitArmor.Value;
+                rabbitCape.ItemDrop.m_itemData.m_shared.m_armorPerLevel = RabbitArmorPerLevel.Value;
+            }
+            ItemManager.Instance.AddItem(rabbitCape);
+
+            //Rusted Cape-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //Needs translation and texture/icon
+            rustedCapeStatus.name = "$status_rustedcape";
+            rustedCapeStatus.m_name = "$status_rustedcape";
+            rustedCapeStatus.m_category = "rustedCape";
+            rustedCapeStatus.m_startMessage = "$status_rustedcape_startmessage";
+            rustedCapeStatus.m_tooltip = "$status_rustedcape_tooltip";
+            rustedCapeStatus.m_speedModifier = RustedSpeed.Value;
+
+            ItemConfig rustedCapeConf = new ItemConfig();
+            rustedCapeConf.Name = "$item_rustedcape";
+            rustedCapeConf.Description = "$item_rustedcape_desc";
+            rustedCapeConf.CraftingStation = "piece_workbench";
+            rustedCapeConf.AddRequirement(new RequirementConfig("IronScrap", 7, 3));
+            rustedCapeConf.AddRequirement(new RequirementConfig("TrophyDraugrElite", 1, 0));
+            rustedCapeConf.AddRequirement(new RequirementConfig("Guck", 15, 5));
+
+            //Sprite and Texture loading
+            Sprite rustedIcon = AssetUtils.LoadSpriteFromFile("HappyDragoon-DragoonCapes/Assets/rustedIcon.png");
+            Texture2D rustedTex = AssetUtils.LoadTexture("HappyDragoon-DragoonCapes/Assets/rustedTexture.png");
+            rustedCapeConf.Icons = new Sprite[] { rustedIcon };
+            rustedCapeConf.StyleTex = rustedTex;
+
+            CustomItem rustedCape = new CustomItem("CapeRusted", "CapeAsh", rustedCapeConf);
+            rustedCape.ItemDrop.m_itemData.m_shared.m_attackStaminaModifier = 0f;
+            rustedCape.ItemDrop.m_itemData.m_shared.m_blockStaminaModifier = 0f;
+            if (dragoonCapeEffectsEnabled.Value)
+            {
+                rustedCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = rustedCapeStatus;
+                rustedCape.ItemDrop.m_itemData.m_shared.m_armor = RustedArmor.Value;
+                rustedCape.ItemDrop.m_itemData.m_shared.m_armorPerLevel = RustedArmorPerLevel.Value;
+            }
+            ItemManager.Instance.AddItem(rustedCape);
 
             //Fall Damage Belt-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             featherBeltStatus.name = "$status_featherbelt";

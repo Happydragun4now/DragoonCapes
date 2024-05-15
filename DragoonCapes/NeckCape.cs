@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Logger = Jotunn.Logger;
 
 namespace DragoonCapes
 {
@@ -22,7 +23,8 @@ namespace DragoonCapes
         {
             public static bool Prefix(SEMan __instance, int nameHash)
             {
-                if(__instance == null || !__instance.HaveStatusEffectCategory("NeckCape") || !__instance.HaveStatusEffectCategory("surtlingCape"))
+                //Logger.LogInfo(__instance.HaveStatusEffectCategory("NeckCape"));
+                if(__instance == null || !__instance.HaveStatusEffectCategory("NeckCape") && !__instance.HaveStatusEffectCategory("surtlingCape"))
                 {
                     return true;
                 }

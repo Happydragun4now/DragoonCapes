@@ -52,17 +52,18 @@ namespace DragoonCapes
             }
         }
 
-        //Don't spawn a spear from the projectile when it lands
+        //Don't spawn the weapon from the projectile when it lands
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Projectile), "Setup")]
         public static void Proj_Setup_Prefix(Projectile __instance)
         {
             //this might not play well in MP
             Player player = Player.m_localPlayer;
-            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("einherjarCape"))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("einherjarCape") || __instance == null)
             {
                 return;
             }
+            //&& __instance.m_spawnItem.m_shared.m_skillType == Skills.SkillType.Spears
             if (DragoonCapes.Instance.EinherjarEffect.Value)
             {
                 __instance.m_respawnItemOnHit = false;
@@ -74,13 +75,14 @@ namespace DragoonCapes
         public static void AttackTrigger_Prefix(Attack __instance)
         {
             Player player = Player.m_localPlayer;
-            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("einherjarCape"))
+            if (player == null || player.IsDead() || !player.GetSEMan().HaveStatusEffectCategory("einherjarCape") || __instance == null)
             {
                 return;
             }
-            if (DragoonCapes.Instance.EinherjarEffect.Value && __instance.GetWeapon()?.m_shared.m_skillType == Skills.SkillType.Spears && __instance.m_consumeItem == true)
+            //Removed to make it work for modded throwing weapons that aren't spears
+            //&& __instance.GetWeapon()?.m_shared.m_skillType == Skills.SkillType.Spears
+            if (DragoonCapes.Instance.EinherjarEffect.Value && __instance.m_consumeItem == true)
             {
-                //if its a *thrown spear attack and they have the cape on, don't remove spear from inventory
                 __instance.m_consumeItem = false;
             }
         }

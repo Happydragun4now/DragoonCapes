@@ -1,9 +1,11 @@
-﻿using HarmonyLib;
+﻿using BepInEx.Logging;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Logger = Jotunn.Logger;
 
 namespace DragoonCapes
 {
@@ -34,7 +36,7 @@ namespace DragoonCapes
                 bool bowskill = (skillType == Skills.SkillType.Bows || skillType == Skills.SkillType.Crossbows);
                 //Linen Cape
                 //splitshot if bow or staff:
-                if (((bow && bowskill) || (twohand && magic)))
+                if ((bow && bowskill) || (twohand && magic))
                 {
                     if (__instance.m_projectileAccuracy < 3f)
                     {

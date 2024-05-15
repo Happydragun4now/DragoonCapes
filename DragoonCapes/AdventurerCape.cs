@@ -35,7 +35,7 @@ namespace DragoonCapes
             {
                 return;
             }
-            if (item.m_shared.m_equipStatusEffect.m_category == "adventurerCape" && DragoonCapes.Instance.AdventurerComfortBonus.Value > 0 && player.GetSEMan().HaveStatusEffect("Rested"))
+            if (item.m_shared.m_equipStatusEffect.m_category == "adventurerCape" && DragoonCapes.Instance.AdventurerComfortBonus.Value > 0 && player.GetSEMan().HaveStatusEffect("Rested".GetHashCode()))
             {
                 //player.GetSEMan().RemoveStatusEffect("Rested".GetHashCode());
                 //Remove comfort level added x60 seconds from the rested buff when the cape is removed

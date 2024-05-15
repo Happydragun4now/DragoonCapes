@@ -88,7 +88,7 @@ namespace DragoonCapes
                 return;
             }
             //If you have the cape on and aren't burning fix that
-            if (!__instance.GetSEMan().HaveStatusEffect("healstaff_cooldown") && !__instance.GetSEMan().HaveStatusEffect("Burning"))
+            if (!__instance.GetSEMan().HaveStatusEffect("healstaff_cooldown".GetHashCode()) && !__instance.GetSEMan().HaveStatusEffect("Burning".GetHashCode()))
             {
                 HitData selfBurn = new HitData();
                 selfBurn.m_damage.m_fire = 100f + __instance.GetBodyArmor();//this needs to be high enough to evade armor, therefore its the armor value!

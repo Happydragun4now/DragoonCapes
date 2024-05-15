@@ -10,6 +10,9 @@ namespace DragoonCapes
     [HarmonyPatch]
     internal class BoarCape
     {
+        //Deprecated in favor of the new item attribute
+        //boarCape.ItemDrop.m_itemData.m_shared.m_dodgeStaminaModifier 
+        /*
         private static float baseStaminaUse = 10f;
 
         [HarmonyPatch(typeof(Player), "Dodge")]
@@ -28,5 +31,6 @@ namespace DragoonCapes
                 ___m_dodgeStaminaUsage = baseStaminaUse;
             }
         }
+        */
     }
 }

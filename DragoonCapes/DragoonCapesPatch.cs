@@ -12,7 +12,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
-using Steamworks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -109,8 +108,9 @@ internal static class PatchObjectDB
             else if (item.name == "CapeWolf")
             {
                 //set armor and armor per level values on the item according to the config values
-                item.GetComponent<ItemDrop>().m_itemData.m_shared.m_armor = DragoonCapes.DragoonCapes.Instance.WolfArmor.Value;
-                item.GetComponent<ItemDrop>().m_itemData.m_shared.m_armorPerLevel = DragoonCapes.DragoonCapes.Instance.WolfArmorPerLevel.Value;
+                //item.GetComponent<ItemDrop>().m_itemData.m_shared.m_armor = DragoonCapes.DragoonCapes.Instance.WolfArmor.Value;
+                //item.GetComponent<ItemDrop>().m_itemData.m_shared.m_armorPerLevel = DragoonCapes.DragoonCapes.Instance.WolfArmorPerLevel.Value;
+                item.GetComponent<ItemDrop>().m_itemData.m_shared.m_attackStaminaModifier = DragoonCapes.DragoonCapes.Instance.WolfStam.Value * -1f;
                 item.GetComponent<ItemDrop>().m_itemData.m_shared.m_equipStatusEffect = WolfCapeStatus;
             }
             else if (item.name == "CapeLox")

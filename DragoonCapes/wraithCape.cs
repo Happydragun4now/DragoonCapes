@@ -7,7 +7,6 @@ using static Skills;
 using UnityEngine;
 using HarmonyLib;
 using System.Reflection;
-using Steamworks;
 using System.Numerics;
 using Logger = Jotunn.Logger;
 

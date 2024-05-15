@@ -22,7 +22,7 @@ namespace DragoonCapes
                 return;
             }
             SEMan playerStatus = player.GetSEMan();
-            if (playerStatus.HaveStatusEffectCategory("healthpotion") || playerStatus.HaveStatusEffectCategory("staminapotion") || playerStatus.HaveStatusEffectCategory("eitrpotion") || playerStatus.HaveStatusEffect("Potion_frostresist") || playerStatus.HaveStatusEffect("Potion_poisonresist") || playerStatus.HaveStatusEffect("Potion_tasty"))
+            if (playerStatus.HaveStatusEffectCategory("healthpotion") || playerStatus.HaveStatusEffectCategory("staminapotion") || playerStatus.HaveStatusEffectCategory("eitrpotion") || playerStatus.HaveStatusEffect("Potion_frostresist".GetHashCode()) || playerStatus.HaveStatusEffect("Potion_poisonresist".GetHashCode()) || playerStatus.HaveStatusEffect("Potion_tasty".GetHashCode()))
             {
                 if (hit.GetAttacker() == player && (player.GetCurrentWeapon().m_shared.m_skillType == Skills.SkillType.Unarmed))
                 {

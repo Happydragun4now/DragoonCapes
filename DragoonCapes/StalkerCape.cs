@@ -27,7 +27,7 @@ namespace DragoonCapes
             //This works but shows the bow skill during the daytime
             if (skillType == Skills.SkillType.Bows)
             {
-                if (EnvMan.instance.IsNight())
+                if (EnvMan.IsNight())
                 {
                     __result = Mathf.Clamp(__instance.GetSkillLevel(skillType)/100f, 0f, (100f+DragoonCapes.Instance.nightstalkerSkill.Value)/100f);
                 }

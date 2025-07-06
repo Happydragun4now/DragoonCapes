@@ -22,6 +22,12 @@ namespace DragoonCapes
                 return;
             }
             SEMan playerStatus = player.GetSEMan();
+            if (hit.GetAttacker() == player && (player.GetCurrentWeapon().m_shared.m_skillType == Skills.SkillType.Unarmed))
+            {
+                //Logger.LogInfo("Pre-Buff Damage: " + hit.m_damage.GetTotalDamage());
+                hit.m_damage.Modify(1f + DragoonCapes.Instance.HrugnirDamageMult.Value);
+            }
+            /*
             if (playerStatus.HaveStatusEffectCategory("healthpotion") || playerStatus.HaveStatusEffectCategory("staminapotion") || playerStatus.HaveStatusEffectCategory("eitrpotion") || playerStatus.HaveStatusEffect("Potion_frostresist".GetHashCode()) || playerStatus.HaveStatusEffect("Potion_poisonresist".GetHashCode()) || playerStatus.HaveStatusEffect("Potion_tasty".GetHashCode()))
             {
                 if (hit.GetAttacker() == player && (player.GetCurrentWeapon().m_shared.m_skillType == Skills.SkillType.Unarmed))
@@ -30,7 +36,7 @@ namespace DragoonCapes
                     hit.m_damage.Modify(1f+DragoonCapes.Instance.HrugnirDamageMult.Value);
                 }
             }
-            
+            */
         }
     }
 }

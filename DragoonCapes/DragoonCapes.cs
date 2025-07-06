@@ -448,8 +448,6 @@ namespace DragoonCapes
 
             //Change Shaman/Bush cape feather trail effect? (Custom unity model?)
 
-            //update Bepinex, valheim references https://jotunnlib.github.io/jotunnlib/tutorials/getting-started.html
-
             //variable paths that dont rely on the folder being named properly
             //var CultistIconPath = Path.Combine(Path.GetDirectoryName(Info.Location), "cultistIcon.png");
             //Jotunn.Logger.LogMessage("Cultist Path: " + CultistIconPath);//message,debug or info?
@@ -460,14 +458,11 @@ namespace DragoonCapes
             //
 
             //1 Ashlands
-            //White ash lox cape?
+            //White ash lox cape - Effect? Insane health regen?
 
-            //1 Swamp
-            //Rusted cape, high armor, slower movement
-
-            //3 Ocean
+            //Ocean - should this have 4 capes really?
             //Pufferfish ocean cape? Thorns effect?
-            //Pirate lord coat?
+            //Pirate lord coat? - Blue ashen cape prefab!!! Slash resist?
 
             //demister cape, carry weight cape to provide alternatives for utility slot.
             //Some kind of looting cape? Midas cape that makes every enemy drop a tiny bit of gold?
@@ -1246,6 +1241,7 @@ namespace DragoonCapes
             CustomItem rustedCape = new CustomItem("CapeRusted", "CapeAsh", rustedCapeConf);
             rustedCape.ItemDrop.m_itemData.m_shared.m_attackStaminaModifier = 0f;
             rustedCape.ItemDrop.m_itemData.m_shared.m_blockStaminaModifier = 0f;
+            rustedCape.ItemDrop.m_itemData.m_shared.m_damageModifiers.Clear();
             if (dragoonCapeEffectsEnabled.Value)
             {
                 rustedCape.ItemDrop.m_itemData.m_shared.m_equipStatusEffect = rustedCapeStatus;

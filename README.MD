@@ -65,6 +65,7 @@ https://github.com/Happydragun4now/DragoonCapes/issues
 
 <details>
 <summary>Change log (spoilers)</summary>
+1.3.3 - Fixed Textures not being inlcuded with main zip<br>
 1.3.2 - Ashlands Patches, New Capes, reworked capes, Updated Korean Translation, fixed neck/surtling cape bug, fixed EpicLoot Thrown weapons compatability for Einherjar cape<br>
 1.3.1 - Brawler and Knight Cape bug fix, Korean translation thanks to So1207<br>
 1.3.0 - Adventurer bug fixes, add a lot of safety code to all capes to hopefully prevent errors. AI Chinese Localization files<br>

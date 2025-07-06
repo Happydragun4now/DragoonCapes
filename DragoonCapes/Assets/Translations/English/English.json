@@ -163,7 +163,7 @@
 	"$status_rabbitcape_startmessage": "The grass smell nice.",
 
 	"$item_rustedcape": "Rusted Cape",
-	"$item_rustedcape_desc": "Made using an old swamp magic trick that makes iron flow like fabric. Unfortunately it doesn't help with rust or the weight.'",
+	"$item_rustedcape_desc": "Made using an old swamp magic trick that makes iron flow like fabric. Unfortunately it doesn't help with rust or the weight.",
 	"$status_rustedcape": "Iron's Weight",
 	"$status_rustedcape_tooltip": "The mass or iron protecting you is also weighing you down.",
 	"$status_rustedcape_startmessage": "Where there's an iron will, there's an iron way.",

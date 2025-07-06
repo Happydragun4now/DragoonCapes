@@ -356,13 +356,13 @@ namespace DragoonCapes
             new AcceptableValueRange<float>(0.01f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
-            nightstalkerRegen = Config.Bind("Server config", "nightstalkerRegen", 1.3f,
+            nightstalkerRegen = Config.Bind("Server config", "nightstalkerRegen", 1.15f,
             new ConfigDescription("Nightstalker cape stamina regen multiplier when cold.", null,
             new AcceptableValueRange<float>(0.01f, 100f),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            nightstalkerSkill = Config.Bind("Server config", "nightstalkerSkill", 30,
+            nightstalkerSkill = Config.Bind("Server config", "nightstalkerSkill", 10,
             new ConfigDescription("Nightstalker cape bow skill bonus during night-time", null,
-            new AcceptableValueRange<int>(0, 100),
+            new AcceptableValueRange<int>(0, 300),
             new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             AdventurerEffect = Config.Bind("Server config", "AdventurerEffect", true,
@@ -1102,11 +1102,12 @@ namespace DragoonCapes
             stalkerCapeStatus.name = "$status_stalkerscape";
             stalkerCapeStatus.m_name = "$status_stalkerscape";
             stalkerCapeStatus.m_category = "stalkerCape";
-            stalkerCapeStatus.m_tooltip = "$status_stalkerscape_tooltip";
+            stalkerCapeStatus.m_tooltip = "$status_stalkerscape_tooltip\n<color=orange>$status_stalkerscape_tooltip1</color>" + nightstalkerSkill.Value + "% <color=orange>$status_stalkerscape_tooltip2</color>";
             stalkerCapeStatus.m_startMessage = "$status_stalkerscape_startmessage";
             stalkerCapeStatus.m_staminaRegenMultiplier = nightstalkerRegen.Value;
-            stalkerCapeStatus.m_skillLevel = Skills.SkillType.Bows;
-            stalkerCapeStatus.m_skillLevelModifier = nightstalkerSkill.Value;
+            //shows the bow skill bonus on the bow and on skill menu
+            //stalkerCapeStatus.m_skillLevel = Skills.SkillType.Bows;
+            //stalkerCapeStatus.m_skillLevelModifier = nightstalkerSkill.Value;
 
             ItemConfig stalkerCapeConf = new ItemConfig();
             stalkerCapeConf.Name = "$item_stalkerscape";

@@ -25,20 +25,20 @@ namespace DragoonCapes
                 return;
             }
             //This works but shows the bow skill during the daytime
-            if (skillType == Skills.SkillType.Bows)
-            {
+            //if (skillType == Skills.SkillType.Bows)
+            //{
+                float skillLevel = __instance.GetSkillLevel(skillType);
                 if (EnvMan.IsNight())
                 {
-                    __result = Mathf.Clamp(__instance.GetSkillLevel(skillType)/100f, 0f, (100f+DragoonCapes.Instance.nightstalkerSkill.Value)/100f);
+                    __result = Mathf.Max(skillLevel/100f, 0f) * (1 + DragoonCapes.Instance.nightstalkerSkill.Value/100f);
                 }
                 else
                 {
-                    float newSkill = __instance.GetSkillLevel(skillType) - DragoonCapes.Instance.nightstalkerSkill.Value;
-                    __result = Mathf.Clamp(newSkill / 100f, 0f, (100f + DragoonCapes.Instance.nightstalkerSkill.Value) / 100f);
+                    __result = Mathf.Max(skillLevel / 100f, 0f);
                 }
                 //__result += DragoonCapes.Instance.nightstalkerSkillFactor.Value;//increases the returned bow skill factor by the config value in a way it can go over 100 bow skill
                 //Logger.LogInfo("Returned Bow Skill: " + __result);
-            }
+            //}
         }
 
     }

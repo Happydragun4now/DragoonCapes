@@ -131,8 +131,8 @@
 	"$item_brawlercape": "Hrungnir Cape",
 	"$item_brawlercape_desc": "A jotunn's rage and appetite for beer always win out in a brawl.",
 	"$status_brawlercape": "Jotunn's Stupor",
-	"$status_brawlercape_tooltip": "Damage bonus while you have a mead active.",
-	"$status_brawlercape_tooltip1": "Unarmed damage bonus after drinking: ",
+	"$status_brawlercape_tooltip": "Giant's strength will wear off onto you a little bit, and their urge to drink more mead.",
+	"$status_brawlercape_tooltip1": "Unarmed/Fist damage bonus: ",
 	"$status_brawlercape_startmessage": "BRAAAAAAP",
 
 	"$item_leechcape": "Leech Cape",
@@ -143,9 +143,11 @@
 	"$status_leechcape_startmessage": "The tang of iron fills your mouth.",
 
 	"$item_stalkerscape": "Stalker Cape",
-	"$item_stalkerscape_desc": "A pitch black cape to help you blend in during the night.",
+	"$item_stalkerscape_desc": "A pitch black cape to help you blend in during the night. Worn by expert thiefs and warriors alike.",
 	"$status_stalkerscape": "Stalker's Strike",
-	"$status_stalkerscape_tooltip": "The cold fortifies your arm and aim. Bow bonus only works at night!",
+	"$status_stalkerscape_tooltip": "The cold of night fortifies your skill..",
+	"status_stalkerscape_tooltip1": "All Skills are ",
+	"$status_stalkerscape_tooltip2": "more effective at night.",
 	"$status_stalkerscape_startmessage": "I was born in the dark, molded by it.",
 
 	"$item_adventurercape": "Adventurer Cape",

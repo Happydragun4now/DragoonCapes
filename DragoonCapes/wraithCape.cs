@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,7 +63,7 @@ namespace DragoonCapes
 
                 //reminder that currentVel is not the same on the character typically uses... For some reason saving it seperately from .velocity makes a difference
                 currentVel = UnityEngine.Vector3.Lerp(currentVel, b, 0.5f);
-                playerBody.velocity = currentVel;
+                playerBody.linearVelocity = currentVel;
 
                 playerBody.useGravity = false;
                 m_maxAirAltitude = playerBody.transform.position.y;

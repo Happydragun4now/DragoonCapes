@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
@@ -23,7 +23,7 @@
     <None Remove="BackupAssets\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JotunnLib" Version="2.25.0" />
+    <PackageReference Include="JotunnLib" Version="2.30.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
@@ -48,7 +48,7 @@
     <PackageReference Include="MonoMod.RuntimeDetour" Version="25.2.3" />
     <PackageReference Include="MonoMod.Utils" Version="25.0.8" />
   </ItemGroup>
-  <Target Name="JotunnPostBuildTaskWin" Condition="'$(OS)' == 'Windows_NT'">
+  <Target Name="JotunnPostBuildTaskWin" Condition="'$(OS)' == 'Windows_NT' And '$(MOD_DEPLOYPATH)' != ''">
     <Exec Command="powershell.exe -ExecutionPolicy RemoteSigned -File &quot;$(SolutionDir)publish.ps1&quot; -Target &quot;$(ConfigurationName)&quot; -TargetPath &quot;$(TargetDir.TrimEnd('\'))&quot; -TargetAssembly &quot;$(TargetFileName)&quot; -ValheimPath &quot;$(VALHEIM_INSTALL.TrimEnd('\'))&quot; -DeployPath &quot;$(MOD_DEPLOYPATH.TrimEnd('\'))&quot; -ProjectPath &quot;$(ProjectDir.TrimEnd('\'))&quot; " />
   </Target>
   <PropertyGroup>
@@ -57,15 +57,12 @@
       JotunnPostBuildTaskWin
     </BuildDependsOn>
   </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>xcopy /R/Y/E/I "F:\ValheimModding\DragoonCapesGit\DragoonCapes\Assets\*" "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\HappyDragoon-DragoonCapes\"
-xcopy /R/Y/E/I/F "F:\ValheimModding\DragoonCapesGit\DragoonCapes\bin\Debug\net48\DragoonCapes.dll" "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\HappyDragoon-DragoonCapes\"</PostBuildEvent>
-  </PropertyGroup>
+
   <PropertyGroup>
     <AssemblyTitle>DragoonCapes</AssemblyTitle>
     <Product>DragoonCapes</Product>
     <Copyright>Copyright ©  2021</Copyright>
-    <AssemblyVersion>0.0.1.0</AssemblyVersion>
-    <FileVersion>0.0.1.0</FileVersion>
+    <AssemblyVersion>1.3.6.0</AssemblyVersion>
+    <FileVersion>1.3.6.0</FileVersion>
   </PropertyGroup>
 </Project>

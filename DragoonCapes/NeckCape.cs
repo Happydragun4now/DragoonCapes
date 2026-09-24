@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,8 @@ namespace DragoonCapes
         typeof(int),
         typeof(bool),
         typeof(int),
-        typeof(float)
+        typeof(float),
+        typeof(short)
         })]
         public static class Waterproof_SEMan_AddStatusEffect_Patch
         {
